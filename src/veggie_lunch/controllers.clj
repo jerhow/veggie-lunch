@@ -1,5 +1,6 @@
 (ns veggie-lunch.controllers
-  (:require [ring.util.response :refer [response content-type status header]]
+  (:require [veggie-lunch.commands :as commands]
+            [ring.util.response :refer [response content-type status header]]
             [clojure.string :refer [split]]))
 
 (def permitted-commands (set ["" 
@@ -20,11 +21,8 @@
   (let [text-field (:text (:params request))
         text-parts (split text-field #" ")
         command (first text-parts)]
-    (println command)
-    (println (contains? permitted-commands command))
-    
     (if (contains? permitted-commands command)
-      (response (str "\"" command "\"" " valid command"))
+      (response (commands/help))
       (response "Error: Sorry, I don't recognize that command."))
       ; (header (response text-field) "status" "200 OK")
       ; (header (response text-field) "status" "500 Error"))

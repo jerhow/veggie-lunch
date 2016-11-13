@@ -1,6 +1,8 @@
 (ns veggie-lunch.commands
-  (:require [ring.util.response :refer [response content-type status header]]
-            [clojure.string :refer [split]]))
+  (:require [veggie-lunch.db.core :as db]
+            [veggie-lunch.helpers :as helpers]
+            [ring.util.response :refer [response content-type status header]]
+            [clojure.string :refer [split join]]))
 
 (defn --help [request]
     (str "TODO: Fill out the --help documentation"))
@@ -31,3 +33,9 @@
 
 (defn --user-remove [request]
     (str "TODO: --user-remove"))
+
+(defn --list-users 
+    "Fetches users from DB; returns results as a string, formatted for Slack"
+    [request]
+    (let [users (db/list-users)]
+        (join (map helpers/stringify-users-row users))))

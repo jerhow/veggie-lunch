@@ -26,3 +26,9 @@ VALUES (
 -- name: test-fetch
 -- Just a test fetch (from 'users')
 select * from users;
+
+-- name: list-users
+-- Just a test fetch (from 'users')
+SELECT id, slack_user_id, slack_user_name, created_dt, active, full_name
+FROM users
+ORDER BY full_name;

@@ -13,7 +13,8 @@
                               "--unlock"
                               "--set-menu-url"
                               "--user-add"
-                              "--user-remove"]))
+                              "--user-remove"
+                              "--list-users"]))
 
 (defn dispatch 
   "Basically an internal router, since every request comes in on '/'. 
@@ -37,9 +38,11 @@
     "--set-menu-url" (commands/--set-menu-url request)
     "--user-add" (commands/--user-add request)
     "--user-remove" (commands/--user-remove request)
+    "--list-users" (commands/--list-users request)
     ""))
 
 (defn home [request]
+
   (let [text-field (:text (:params request))
         text-parts (str/split text-field #" ")
         command (first text-parts)

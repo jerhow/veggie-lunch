@@ -14,4 +14,5 @@
                 [yesql "0.5.3"]]
   :main ^:skip-aot veggie-lunch.core
   :target-path "target/%s"
-  :profiles {:uberjar {:aot :all}})
+  :profiles {:uberjar {:aot :all}}
+  :source-paths ["src" "src/veggie_lunch" "src/veggie_lunch/db"])

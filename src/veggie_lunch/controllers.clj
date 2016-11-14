@@ -4,6 +4,7 @@
             [clojure.string :as str]))
 
 (def permitted-commands (set ["" 
+                              "--about" 
                               "--help" 
                               "--list" 
                               "--order" 
@@ -28,6 +29,7 @@
   [request command]
   
   (case command
+    "--about" (commands/--about request)
     "--help" (commands/--help request)
     "--list" (commands/--list request)
     "--order" (commands/--order request)

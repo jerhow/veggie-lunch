@@ -4,6 +4,9 @@
             [ring.util.response :refer [response content-type status header]]
             [clojure.string :refer [split join]]))
 
+(defn --about [request]
+    (str "Veggie-Lunch version " (:app-version request)))
+
 (defn --help [request]
     (str "TODO: Fill out the --help documentation"))
 

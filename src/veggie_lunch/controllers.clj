@@ -43,7 +43,11 @@
     "--list-users" (commands/--list-users request)
     ""))
 
-(defn home [request]
+(defn home 
+  "Handler for the home route (which is the only route we can have 
+  because of the way that Slack commands work)"
+
+  [request]
 
   (let [text-field (:text (:params request))
         text-parts (str/split text-field #" ")

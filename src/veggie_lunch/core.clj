@@ -9,7 +9,7 @@
             [org.httpkit.server :refer [run-server]]))
 
 (defroutes all-routes
-    (GET "/" [request] controllers/home))
+    (POST "/" [request] controllers/home))
 
 (defn -main []
     "This is the idiomatic way of applying the various middleware pieces,
@@ -18,7 +18,7 @@
      just lined the middleware from inside to out based on the original -main implementation."
     (run-server
         (-> all-routes
-            (wrap-defaults site-defaults)
+            (wrap-defaults api-defaults)
             (wrap-params)
             (middleware/wrap-version)
             ; (middleware/wrap-spy)

@@ -54,7 +54,7 @@
         command (first text-parts)
         command-no-dashes (str/replace command #"^\-\-" "")]
     (if (contains? permitted-commands command)
-      (dispatch request command)
+      (response (dispatch request command))
       (header (response text-field) "status" "500 Error"))))
 
 (defn home-ORIG [request]

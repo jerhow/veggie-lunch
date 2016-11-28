@@ -53,3 +53,14 @@ select * from users;
 SELECT id, slack_user_id, slack_user_name, created_dt, active, full_name
 FROM users
 ORDER BY full_name;
+
+-- name: user-add!
+-- Insert a user in the users table
+INSERT INTO users (
+    slack_user_name,
+    full_name
+)
+VALUES (
+    :slack_user_name,
+    :full_name
+);

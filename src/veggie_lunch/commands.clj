@@ -34,13 +34,15 @@
 (defn --user-add 
     "Add a user to the system"
     [request]
-    ; (str "TODO: --user-add")
-    ; (println request)
-    ; (println (:user_id (:params request)))
     (let [slack-user-id (:user_id (:params request))
           slack-user-name (:user_name (:params request))
-          command-text (:text (:params request))]
-          (println (helpers/split-command-text command-text))))
+          command-text (:text (:params request))
+          payload (helpers/split-command-text command-text)]
+          (if (try (db/user-add! {
+                :slack_user_name (:slack-user-name payload)
+                :full_name (str(:full-name payload))}) (catch Exception e))
+              "TODO: Build a 'success' response"
+              "TODO: Build a 'not so much' response")))
 
 (defn --user-remove [request]
     (str "TODO: --user-remove"))

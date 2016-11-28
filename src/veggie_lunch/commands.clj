@@ -31,8 +31,16 @@
 (defn --set-menu-url [request]
     (str "TODO: --set-menu-url"))
 
-(defn --user-add [request]
-    (str "TODO: --user-add"))
+(defn --user-add 
+    "Add a user to the system"
+    [request]
+    ; (str "TODO: --user-add")
+    ; (println request)
+    ; (println (:user_id (:params request)))
+    (let [slack-user-id (:user_id (:params request))
+          slack-user-name (:user_name (:params request))
+          command-text (:text (:params request))]
+          (println (helpers/split-command-text command-text))))
 
 (defn --user-remove [request]
     (str "TODO: --user-remove"))

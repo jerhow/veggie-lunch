@@ -37,8 +37,8 @@
 (defn --user-remove [request]
     (str "TODO: --user-remove"))
 
-(defn --list-users 
+(defn --user-list 
     "Fetches users from DB; returns results as a string, formatted for Slack"
     [request]
-    (let [users (db/list-users)]
+    (let [users (db/user-list)]
         (join (map helpers/stringify-users-row users))))

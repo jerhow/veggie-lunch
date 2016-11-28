@@ -40,7 +40,7 @@
     "--set-menu-url" (commands/--set-menu-url request)
     "--user-add" (commands/--user-add request)
     "--user-remove" (commands/--user-remove request)
-    "--list-users" (commands/--list-users request)
+    "--user-list" (commands/--user-list request)
     ""))
 
 (defn home 

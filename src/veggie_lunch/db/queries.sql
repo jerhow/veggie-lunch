@@ -49,8 +49,7 @@ CREATE TABLE IF NOT EXISTS order_items (
 -- Just a test fetch (from 'users')
 select * from users;
 
--- name: list-users
--- Just a test fetch (from 'users')
+-- name: user-list
 SELECT id, slack_user_id, slack_user_name, created_dt, active, full_name
 FROM users
 ORDER BY full_name;

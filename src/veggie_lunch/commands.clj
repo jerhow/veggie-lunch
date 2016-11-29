@@ -40,7 +40,7 @@
           payload (helpers/split-command-text command-text)]
           (if (try (db/user-add! {
                 :slack_user_name (:slack-user-name payload)
-                :full_name (str(:full-name payload))}) (catch Exception e))
+                :full_name (join " " (:full-name payload))}) (catch Exception e))
               "TODO: Build a 'success' response"
               "TODO: Build a 'not so much' response")))
 

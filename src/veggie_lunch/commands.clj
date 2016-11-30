@@ -41,8 +41,11 @@
           (if (try (db/user-add! {
                 :slack_user_name (:slack-user-name payload)
                 :full_name (join " " (:full-name payload))}) (catch Exception e))
-              "TODO: Build a 'success' response"
-              "TODO: Build a 'not so much' response")))
+              (str "User added: " (:slack-user-name payload)            ; Success!
+                " (" (join " " (:full-name payload)) ")\n:thumbs_up:")
+              (str "Oops, something went wrong :disappointed: \n"       ; Not so much.
+                "User " (:slack-user-name payload) " (" (join " " (:full-name payload)) ") not added.\n"
+                "Thanks Obama."))))
 
 (defn --user-remove [request]
     (str "TODO: --user-remove"))

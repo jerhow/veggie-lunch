@@ -1,5 +1,6 @@
 (ns veggie-lunch.controllers
   (:require [veggie-lunch.commands :as commands]
+            [veggie-lunch.helpers :refer [dispatch]]
             [ring.util.response :refer [response content-type status header]]
             [clojure.string :as str]))
 
@@ -16,16 +17,6 @@
                               "--user-add"
                               "--user-remove"
                               "--list-users"]))
-
-(defn dispatch 
-  "Basically an internal router, since every request comes in on '/'. 
-   We dynamically resolve the command's corresponding function name 
-   from the 'command' argument. Invalid values for 'command' are
-   screened out in 'home' prior to 'dispatch' being called."
-
-  [request command]
-
-  ((ns-resolve 'veggie-lunch.commands (symbol command)) request))
 
 (defn home 
   "Handler for the home route (which is the only route we can have 

@@ -19,29 +19,13 @@
 
 (defn dispatch 
   "Basically an internal router, since every request comes in on '/'. 
-  Once I figure out how to resolve/invoke a function from a string (without using eval),
-  I will replace this hard-coded case block with something more elegant.
-  
-  NOTE: I'm working through some of the ideas here:
-  http://stackoverflow.com/questions/3407921/clojure-resolving-function-from-string-name
-  ...and while I can get it working in the REPL, I haven't quite gotten the app to cooperate yet."
+   We dynamically resolve the command's corresponding function name 
+   from the 'command' argument. Invalid values for 'command' are
+   screened out in 'home' prior to 'dispatch' being called."
 
   [request command]
-  
-  (case command
-    "--about" (commands/--about request)
-    "--help" (commands/--help request)
-    "--list" (commands/--list request)
-    "--order" (commands/--order request)
-    "--delete" (commands/--delete request)
-    "--menu" (commands/--menu request)
-    "--lock" (commands/--lock request)
-    "--unlock" (commands/--unlock request)
-    "--set-menu-url" (commands/--set-menu-url request)
-    "--user-add" (commands/--user-add request)
-    "--user-remove" (commands/--user-remove request)
-    "--user-list" (commands/--user-list request)
-    ""))
+
+  ((ns-resolve 'veggie-lunch.commands (symbol command)) request))
 
 (defn home 
   "Handler for the home route (which is the only route we can have 

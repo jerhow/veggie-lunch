@@ -32,7 +32,7 @@
     (str "TODO: --set-menu-url"))
 
 (defn --user-add 
-    "Add a user to the system"
+    "Add a user to the system. Ensures that only Admin users can execute this command."
     [request]
     (let [op-user-id (:user_id (:params request))
           op-user-name (:user_name (:params request))
@@ -40,10 +40,16 @@
           payload (helpers/split-command-text command-text)
           slack-user-name (:slack-user-name payload)
           full-name (join " " (:full-name payload))]
-          (if (try (db/user-add! {:slack_user_name slack-user-name :full_name full-name}) (catch Exception e))
+          
+          ; These nested if's are kind of gross. Perhaps I can figure out something more Clojure-idiomatic later.
+          (if (helpers/user-is-admin? op-user-name)
+            
+            (if (try (db/user-add! {:slack_user_name slack-user-name :full_name full-name}) (catch Exception e))
               (str "User added: " slack-user-name " (" full-name ")\n:thumbs_up:")
               (str "Oops, something went wrong :disappointed: \n"
-                "User " slack-user-name " (" full-name ") not added.\nThanks Obama."))))
+                "User " slack-user-name " (" full-name ") not added.\nThanks Obama :unamused:"))
+
+            (str "Oops, only Admins can issue this command.\nThanks Obama :unamused:"))))
 
 (defn --user-remove [request]
     (str "TODO: --user-remove"))

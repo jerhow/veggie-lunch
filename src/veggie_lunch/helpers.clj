@@ -1,5 +1,6 @@
 (ns veggie-lunch.helpers
-    (:require [clojure.string :as str]))
+    (:require [veggie-lunch.db.core :as db]
+              [clojure.string :as str]))
 
 (def permitted-commands (set ["" 
                               "--about" 
@@ -41,3 +42,9 @@
         (hash-map :command (first text-parts)
                   :slack-user-name (first (next text-parts))
                   :full-name (next (next text-parts)))))
+
+(defn user-is-admin? 
+    "Pass it a Slack user name, get back a boolean answer"
+    [slack-user-name]
+    (let [rows (db/fetch-user-as-admin {:slack_user_name slack-user-name})]
+        (not (empty? rows))))

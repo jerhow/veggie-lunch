@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS users (
     created_dt DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, 
     active BOOLEAN NOT NULL DEFAULT (0),
     full_name TEXT NOT NULL DEFAULT (''),
+    level INTEGER NOT NULL DEFAULT (1),
     CONSTRAINT slack_user_name_unique UNIQUE (slack_user_name)
 );
 
@@ -18,7 +19,7 @@ INSERT INTO users (
 )
 VALUES (
     'U2XCP90V7',
-    'rn',
+    '@rn',
     1,
     'Jerry'
 );
@@ -44,6 +45,25 @@ CREATE TABLE IF NOT EXISTS order_items (
     FOREIGN KEY (order_id) REFERENCES orders (id),
     CONSTRAINT slack_user_name_unique UNIQUE (user_id, order_id)
 );
+
+-- name: create-table-user-level!
+CREATE TABLE user_level (
+    id INTEGER PRIMARY KEY,
+    level TEXT NOT NULL
+);
+
+-- name: populate-user-level!
+INSERT INTO user_level (id, level)
+VALUES (1, 'User'), (2, 'Admin');
+
+-- name: fetch-user-as-admin
+-- Try to fetch a user as an admin, to see if they actually are one
+SELECT u.full_name
+FROM users AS u 
+INNER JOIN user_level AS ul
+ON u.level = ul.id
+WHERE u.slack_user_name = :slack_user_name
+AND ul.level = 'Admin';
 
 -- name: test-fetch
 -- Just a test fetch (from 'users')

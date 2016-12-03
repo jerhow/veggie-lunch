@@ -34,18 +34,16 @@
 (defn --user-add 
     "Add a user to the system"
     [request]
-    (let [slack-user-id (:user_id (:params request))
-          slack-user-name (:user_name (:params request))
+    (let [op-user-id (:user_id (:params request))
+          op-user-name (:user_name (:params request))
           command-text (:text (:params request))
-          payload (helpers/split-command-text command-text)]
-          (if (try (db/user-add! {
-                :slack_user_name (:slack-user-name payload)
-                :full_name (join " " (:full-name payload))}) (catch Exception e))
-              (str "User added: " (:slack-user-name payload)            ; Success!
-                " (" (join " " (:full-name payload)) ")\n:thumbs_up:")
-              (str "Oops, something went wrong :disappointed: \n"       ; Not so much.
-                "User " (:slack-user-name payload) " (" (join " " (:full-name payload)) ") not added.\n"
-                "Thanks Obama."))))
+          payload (helpers/split-command-text command-text)
+          slack-user-name (:slack-user-name payload)
+          full-name (join " " (:full-name payload))]
+          (if (try (db/user-add! {:slack_user_name slack-user-name :full_name full-name}) (catch Exception e))
+              (str "User added: " slack-user-name " (" full-name ")\n:thumbs_up:")
+              (str "Oops, something went wrong :disappointed: \n"
+                "User " slack-user-name " (" full-name ") not added.\nThanks Obama."))))
 
 (defn --user-remove [request]
     (str "TODO: --user-remove"))

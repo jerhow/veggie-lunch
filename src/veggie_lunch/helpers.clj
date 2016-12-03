@@ -1,6 +1,20 @@
 (ns veggie-lunch.helpers
     (:require [clojure.string :as str]))
 
+(def permitted-commands (set ["" 
+                              "--about" 
+                              "--help" 
+                              "--list" 
+                              "--order" 
+                              "--delete" 
+                              "--menu" 
+                              "--lock"
+                              "--unlock"
+                              "--set-menu-url"
+                              "--user-add"
+                              "--user-remove"
+                              "--list-users"]))
+
 (defn dispatch 
   "Basically an internal router, since every request comes in on '/'. 
    We dynamically resolve the command's corresponding function name 

@@ -1,22 +1,8 @@
 (ns veggie-lunch.controllers
   (:require [veggie-lunch.commands :as commands]
-            [veggie-lunch.helpers :refer [dispatch]]
+            [veggie-lunch.helpers :refer [dispatch permitted-commands]]
             [ring.util.response :refer [response content-type status header]]
             [clojure.string :as str]))
-
-(def permitted-commands (set ["" 
-                              "--about" 
-                              "--help" 
-                              "--list" 
-                              "--order" 
-                              "--delete" 
-                              "--menu" 
-                              "--lock"
-                              "--unlock"
-                              "--set-menu-url"
-                              "--user-add"
-                              "--user-remove"
-                              "--list-users"]))
 
 (defn home 
   "Handler for the home route (which is the only route we can have 

@@ -17,9 +17,3 @@
     (if (contains? permitted-commands command)
       (response (dispatch request command))
       (header (response text-field) "status" "500 Error"))))
-
-(defn home-ORIG [request]
-  (str "Veggie-Lunch version " (:app-version request) 
-    "<br /><br />"
-    "Add query string param 'foo' to test:<br />"
-    "foo=" (:foo (:params request))))

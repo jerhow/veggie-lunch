@@ -84,3 +84,8 @@ VALUES (
     :slack_user_name,
     :full_name
 );
+
+-- name: user-remove!
+-- Delete a user from the users table, based on Slack user name
+DELETE FROM users
+WHERE slack_user_name = :slack_user_name;

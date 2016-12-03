@@ -4,6 +4,10 @@
             [ring.util.response :refer [response content-type status header]]
             [clojure.string :refer [split join]]))
 
+; NOTE: Remember that all of the commands automatically get passed the 'request' map
+; by the dispatcher, meaning you need to pick out anything you may need 
+; from within your command's specific implementation.
+
 (defn --about [request]
     (str "Veggie-Lunch version " (:app-version request)))
 
@@ -51,8 +55,23 @@
 
             (str "Oops, only Admins can issue this command.\nThanks Obama :unamused:"))))
 
-(defn --user-remove [request]
-    (str "TODO: --user-remove"))
+(defn --user-remove 
+    "Delete a user from the system by Slack user name (@name)"
+    [request]
+    (let [op-user-name (:user_name (:params request))
+          command-text (:text (:params request))
+          payload (helpers/split-command-text command-text)
+          slack-user-name (:slack-user-name payload)
+          full-name (join " " (:full-name payload))]
+          
+          (if (helpers/user-is-admin? op-user-name)
+            
+            (if (try (db/user-remove! {:slack_user_name slack-user-name}) (catch Exception e))
+              (str "User " slack-user-name " removed\n:thumbs_up:")
+              (str "Oops, something went wrong :disappointed: \n"
+                "User " slack-user-name " not removed.\nThanks Obama :unamused:"))
+
+            (str "Oops, only Admins can issue this command.\nThanks Obama :unamused:"))))
 
 (defn --user-list 
     "Fetches users from DB; returns results as a string, formatted for Slack"

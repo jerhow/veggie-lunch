@@ -38,8 +38,7 @@
 (defn --user-add 
     "Add a user to the system. Ensures that only Admin users can execute this command."
     [request]
-    (let [op-user-id (:user_id (:params request))
-          op-user-name (:user_name (:params request))
+    (let [op-user-name (:user_name (:params request))
           command-text (:text (:params request))
           payload (helpers/split-command-text command-text)
           slack-user-name (:slack-user-name payload)

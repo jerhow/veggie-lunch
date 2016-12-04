@@ -56,6 +56,12 @@ CREATE TABLE user_level (
 INSERT INTO user_level (id, level)
 VALUES (1, 'User'), (2, 'Admin');
 
+-- name: fetch-user-existence
+-- Just a SELECT on the user to see whether they exist (a non-nil row)
+SELECT id
+FROM users
+WHERE slack_user_name = :slack_user_name;
+
 -- name: fetch-user-as-admin
 -- Try to fetch a user as an admin, to see if they actually are one
 SELECT u.full_name

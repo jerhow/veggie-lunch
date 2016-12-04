@@ -46,6 +46,7 @@
           full-name (join " " (:full-name payload))]
           
           ; These nested if's are kind of gross. Perhaps I can figure out something more Clojure-idiomatic later.
+          ; TODO: Refactor this.
           (if (helpers/user-is-admin? op-user-name)
             
             (if (try (db/user-add! {:slack_user_name slack-user-name :full_name full-name}) (catch Exception e))
@@ -64,12 +65,19 @@
           slack-user-name (:slack-user-name payload)
           full-name (join " " (:full-name payload))]
           
+          ; Hmm, I thought the nested if's were gross in --user-add.
+          ; This is even worse. This seems obviously non-idiomatic, but for now it works.
+          ; TODO: Refactor this.
           (if (helpers/user-is-admin? op-user-name)
-            
-            (if (try (db/user-remove! {:slack_user_name slack-user-name}) (catch Exception e))
-              (str "User " slack-user-name " removed\n:thumbs_up:")
-              (str "Oops, something went wrong :disappointed: \n"
-                "User " slack-user-name " not removed.\nThanks Obama :unamused:"))
+
+            (if (helpers/user-exists? slack-user-name)
+
+                (if (try (db/user-remove! {:slack_user_name slack-user-name}) (catch Exception e))
+                    (str "User " slack-user-name " removed\n:thumbs_up:")
+                    (str "Oops, something went wrong :disappointed: \n"
+                        "User " slack-user-name " not removed.\nThanks Obama :unamused:"))
+
+                (str "Oops, this user doesn't exist, so there's nothing to remove.\nThanks Obama :unamused:"))
 
             (str "Oops, only Admins can issue this command.\nThanks Obama :unamused:"))))
 

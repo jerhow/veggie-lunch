@@ -48,3 +48,9 @@
     [slack-user-name]
     (let [rows (db/fetch-user-as-admin {:slack_user_name slack-user-name})]
         (not (empty? rows))))
+
+(defn user-exists?
+    "Pass it a Slack user name, get back a boolean answer"
+    [slack-user-name]
+    (let [rows (db/fetch-user-existence {:slack_user_name slack-user-name})]
+        (not (empty? rows))))

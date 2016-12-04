@@ -14,7 +14,7 @@
                               "--set-menu-url"
                               "--user-add"
                               "--user-remove"
-                              "--list-users"]))
+                              "--user-list"]))
 
 (defn dispatch 
   "Basically an internal router, since every request comes in on '/'. 

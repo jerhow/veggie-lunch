@@ -84,5 +84,6 @@
 (defn --user-list 
     "Fetches users from DB; returns results as a string, formatted for Slack"
     [request]
-    (let [users (db/user-list)]
-        (join (map helpers/stringify-users-row users))))
+    (if (helpers/user-is-admin? (:user_name (:params request)))
+        (let [users (db/user-list)] (join (map helpers/stringify-users-row users)))
+        (str "Oops, only Admins can issue this command.\nThanks Obama :unamused:")))

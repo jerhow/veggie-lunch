@@ -66,19 +66,23 @@ WHERE slack_user_name = :slack_user_name;
 -- Try to fetch a user as an admin, to see if they actually are one
 SELECT u.full_name
 FROM users AS u 
-INNER JOIN user_level AS ul
-ON u.level = ul.id
+    INNER JOIN user_level AS ul
+    ON u.level = ul.id
 WHERE u.slack_user_name = :slack_user_name
-AND ul.level = 'Admin';
+    AND ul.level = 'Admin';
 
 -- name: test-fetch
 -- Just a test fetch (from 'users')
 select * from users;
 
 -- name: user-list
-SELECT id, slack_user_id, slack_user_name, created_dt, active, full_name
-FROM users
-ORDER BY full_name;
+SELECT u.slack_user_name, u.created_dt, u.full_name, ul.level, 
+    CASE WHEN u.active = 1 THEN 'Active' ELSE 'Inactive' END
+FROM users AS u
+    INNER JOIN user_level AS ul
+    ON u.level = ul.id
+ORDER BY 
+    ul.level, u.full_name;
 
 -- name: user-add!
 -- Insert a user in the users table

@@ -31,9 +31,10 @@
     [row] 
     (str "\n\n" 
         "Slack User Name: " (:slack_user_name row) "\n"
-        "Name: " (:full_name row) "\n"
+        "Full Name: " (:full_name row) "\n"
+        "Level: " (:level row) "\n"
         "Created: " (:created_dt row) "\n"
-        "Active: " (:active row)))
+        "Status: " (:active row)))
 
 (defn split-command-text 
     ""

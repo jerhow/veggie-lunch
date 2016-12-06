@@ -40,9 +40,9 @@
     [request]
     (let [op-user-name (:user_name (:params request))
           command-text (:text (:params request))
-          payload (helpers/split-command-text command-text)
-          slack-user-name (:slack-user-name payload)
-          full-name (join " " (:full-name payload))]
+          command-text-parts (split command-text #" ")
+          slack-user-name (second command-text-parts)
+          full-name (join " " (next (next command-text-parts)))]
           
           ; These nested if's are kind of gross. Perhaps I can figure out something more Clojure-idiomatic later.
           ; TODO: Refactor this.

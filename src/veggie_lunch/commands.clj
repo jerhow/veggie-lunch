@@ -60,9 +60,8 @@
     [request]
     (let [op-user-name (:user_name (:params request))
           command-text (:text (:params request))
-          payload (helpers/split-command-text command-text)
-          slack-user-name (:slack-user-name payload)
-          full-name (join " " (:full-name payload))]
+          command-text-parts (split command-text #" ")
+          slack-user-name (second command-text-parts)]
           
           ; Hmm, I thought the nested if's were gross in --user-add.
           ; This is even worse. This seems obviously non-idiomatic, but for now it works.

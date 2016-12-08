@@ -99,3 +99,9 @@ VALUES (
 -- Delete a user from the users table, based on Slack user name
 DELETE FROM users
 WHERE slack_user_name = :slack_user_name;
+
+-- name: user-perm!
+-- Updates a user's (permission) level
+UPDATE users
+SET level = :level
+WHERE slack_user_name = :slack_user_name;

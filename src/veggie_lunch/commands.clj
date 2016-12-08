@@ -2,7 +2,7 @@
   (:require [veggie-lunch.db.core :as db]
             [veggie-lunch.helpers :as helpers]
             [ring.util.response :refer [response content-type status header]]
-            [clojure.string :refer [split join]]))
+            [clojure.string :refer [capitalize join lower-case split]]))
 
 ; NOTE: Remember that all of the commands automatically get passed the 'request' map
 ; by the dispatcher, meaning you need to pick out anything you may need 
@@ -85,3 +85,35 @@
     (if (helpers/user-is-admin? (:user_name (:params request)))
         (let [users (db/user-list)] (join (map helpers/stringify-users-row users)))
         (str "Oops, only Admins can issue this command.\nThanks Obama :unamused:")))
+
+(defn --user-perm 
+    "Updates a user's (permission) level by Slack @id. 
+    Allowed values for new-level are: 'User' or 'Admin' (case-insensitive). 
+    If new-level is omitted, this function will default to 'User'."
+    [request]
+    (let [op-user-name (:user_name (:params request))
+          command-text (:text (:params request))
+          command-text-parts (split command-text #" ")
+          slack-user-name (nth command-text-parts 1 "")
+          level-whitelist #{"admin" "user"} ; <- a set
+          new-level (nth command-text-parts 2 "User")
+          new-level-int (if (= (lower-case new-level) "admin") 2 1)]
+          
+          ; TODO: If you're going to refactor the cases above, you must do this one,
+          ; as we're up to 4 levels (!) of nested if's. Barf.
+          (if (helpers/user-is-admin? op-user-name)
+
+            (if (contains? level-whitelist (lower-case new-level))
+
+                (if (helpers/user-exists? slack-user-name)
+
+                    (if (try (db/user-perm! {:slack_user_name slack-user-name :level new-level-int}) (catch Exception e))
+                        (str "User " slack-user-name " changed to " (capitalize new-level) "\n:thumbs_up:")
+                        (str "Oops, something went wrong :disappointed: \n"
+                            "User " slack-user-name " was not changed.\nThanks Obama :unamused:"))
+
+                    (str "Oops, this user doesn't exist, so there's nothing to remove.\nThanks Obama :unamused:"))
+
+                (str "Oops, you can't change a user to that.\nThanks Obama :unamused:"))
+
+            (str "Oops, only Admins can issue this command.\nThanks Obama :unamused:"))))

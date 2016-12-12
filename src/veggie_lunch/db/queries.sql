@@ -123,3 +123,8 @@ VALUES (:vendor_name);
 UPDATE orders 
 SET menu_url = :url
 WHERE order_date = :order_date;
+
+-- name: upsert-order-item!
+-- Upsert's (sort of) a user's order_item for the current order
+INSERT OR REPLACE INTO order_items (user_id, order_id, description) 
+VALUES (:user_id, :order_id, :order_text);

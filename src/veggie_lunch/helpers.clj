@@ -70,3 +70,19 @@
     "Returns the date as a YYYY-MM-DD formatted string"
     []
     (first (str/split (time-coerce/to-string (time-core/today))  #"T")))
+
+(defn todays-order-id
+    "Returns the int ID of today's order, or -1 if it doesn't exist"
+    [order-date]
+    (let [rows (db/fetch-order-existence {:order_date order-date})]
+        (if (empty? rows)
+            -1
+            (:id (first rows)))))
+
+(defn fetch-user-id
+    "Pass in a Slack user_name, get back their ID from the users table"
+    [slack-user-name]
+    (let [rows (db/fetch-user-existence {:slack_user_name slack-user-name})]
+        (if (empty? rows)
+            -1
+            (:id (first rows)))))

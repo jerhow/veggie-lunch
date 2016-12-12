@@ -2,9 +2,7 @@
   (:require [veggie-lunch.db.core :as db]
             [veggie-lunch.helpers :as helpers]
             [ring.util.response :refer [response content-type status header]]
-            [clojure.string :refer [capitalize join lower-case split]]
-            [clj-time.core :as time-core]
-            [clj-time.coerce :as time-coerce]))
+            [clojure.string :refer [capitalize join lower-case split]]))
 
 ; NOTE: Remember that all of the commands automatically get passed the 'request' map
 ; by the dispatcher, meaning you need to pick out anything you may need 
@@ -34,8 +32,29 @@
 (defn --unlock [request]
     (str "TODO: --unlock"))
 
-(defn --set-menu-url [request]
-    (str "TODO: --set-menu-url"))
+(defn --set-menu-url 
+    "Admin command. Set the menu URL for today's order."
+    [request]
+    (let [op-user-name (:user_name (:params request))
+          command-text (:text (:params request))
+          command-text-parts (split command-text #" ")
+          url (join " " (rest command-text-parts))]
+
+          (if (helpers/user-is-admin? op-user-name)
+
+            (if (helpers/order-exists? (helpers/todays-date))
+
+                (if (try (db/set-menu-url! {:url url :order_date (helpers/todays-date)}) (catch Exception e))
+                    (str "Menu URL successfully added aww yea")
+                    (str "Oops, something went wrong :disappointed: \n"
+                        "Menu URL not added.\nThanks Obama :unamused:"))
+
+                (str "Oops, something went wrong :disappointed: \n" 
+                    "There is no current order in the system for today.\n"
+                    "Please add that first, then issue this command again.\n"
+                    "Thanks Obama :unamused:"))
+
+            (str "Oops, only Admins can issue this command.\nThanks Obama :unamused:"))))
 
 (defn --new-order 
     "Admin command. Initialize a new order in the system for today's date."
@@ -43,12 +62,11 @@
     (let [op-user-name (:user_name (:params request))
           command-text (:text (:params request))
           command-text-parts (split command-text #" ")
-          vendor-name (join " " (rest command-text-parts))
-          todays-date (first (split (time-coerce/to-string (time-core/today))  #"T"))]
+          vendor-name (join " " (rest command-text-parts))]
 
           (if (helpers/user-is-admin? op-user-name)
 
-            (if (helpers/order-exists? todays-date)
+            (if (helpers/order-exists? (helpers/todays-date))
                 (str "There is already an order in the system for today.\nThanks Obama :unamused:")
                 (if (try (db/create-order! {:vendor_name vendor-name}) (catch Exception e))
                     (str "Today's order successfully added aww yea")

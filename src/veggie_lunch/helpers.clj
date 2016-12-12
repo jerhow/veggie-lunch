@@ -1,6 +1,8 @@
 (ns veggie-lunch.helpers
     (:require [veggie-lunch.db.core :as db]
-              [clojure.string :as str]))
+              [clojure.string :as str]
+              [clj-time.core :as time-core]
+              [clj-time.coerce :as time-coerce]))
 
 (def permitted-commands (set ["" 
                               "--about" 
@@ -63,3 +65,8 @@
     [order-date]
     (let [rows (db/fetch-order-existence {:order_date order-date})]
         (not (empty? rows))))
+
+(defn todays-date 
+    "Returns the date as a YYYY-MM-DD formatted string"
+    []
+    (first (str/split (time-coerce/to-string (time-core/today))  #"T")))

@@ -118,3 +118,8 @@ WHERE order_date = :order_date;
 -- name: create-order!
 INSERT INTO orders (vendor_name)
 VALUES (:vendor_name);
+
+-- name: set-menu-url!
+UPDATE orders 
+SET menu_url = :url
+WHERE order_date = :order_date;

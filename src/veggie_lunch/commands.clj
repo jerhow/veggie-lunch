@@ -2,7 +2,9 @@
   (:require [veggie-lunch.db.core :as db]
             [veggie-lunch.helpers :as helpers]
             [ring.util.response :refer [response content-type status header]]
-            [clojure.string :refer [capitalize join lower-case split]]))
+            [clojure.string :refer [capitalize join lower-case split]]
+            [clj-time.core :as time-core]
+            [clj-time.coerce :as time-coerce]))
 
 ; NOTE: Remember that all of the commands automatically get passed the 'request' map
 ; by the dispatcher, meaning you need to pick out anything you may need 
@@ -35,8 +37,28 @@
 (defn --set-menu-url [request]
     (str "TODO: --set-menu-url"))
 
+(defn --new-order 
+    "Admin command. Initialize a new order in the system for today's date."
+    [request]
+    (let [op-user-name (:user_name (:params request))
+          command-text (:text (:params request))
+          command-text-parts (split command-text #" ")
+          vendor-name (join " " (rest command-text-parts))
+          todays-date (first (split (time-coerce/to-string (time-core/today))  #"T"))]
+
+          (if (helpers/user-is-admin? op-user-name)
+
+            (if (helpers/order-exists? todays-date)
+                (str "There is already an order in the system for today.\nThanks Obama :unamused:")
+                (if (try (db/create-order! {:vendor_name vendor-name}) (catch Exception e))
+                    (str "Today's order successfully added aww yea")
+                    (str "Oops, something went wrong :disappointed: \n"
+                        "New order not added.\nThanks Obama :unamused:")))
+
+            (str "Oops, only Admins can issue this command.\nThanks Obama :unamused:"))))
+
 (defn --user-add 
-    "Add a user to the system. Ensures that only Admin users can execute this command."
+    "Admin command. Add a user to the system."
     [request]
     (let [op-user-name (:user_name (:params request))
           command-text (:text (:params request))
@@ -56,7 +78,7 @@
             (str "Oops, only Admins can issue this command.\nThanks Obama :unamused:"))))
 
 (defn --user-remove 
-    "Delete a user from the system by Slack user name (@name)"
+    "Admin command. Delete a user from the system by Slack user name (@name)"
     [request]
     (let [op-user-name (:user_name (:params request))
           command-text (:text (:params request))
@@ -80,16 +102,16 @@
             (str "Oops, only Admins can issue this command.\nThanks Obama :unamused:"))))
 
 (defn --user-list 
-    "Fetches users from DB; returns results as a string, formatted for Slack"
+    "Admin command. Fetches users from DB; returns results as a string, formatted for Slack"
     [request]
     (if (helpers/user-is-admin? (:user_name (:params request)))
         (let [users (db/user-list)] (join (map helpers/stringify-users-row users)))
         (str "Oops, only Admins can issue this command.\nThanks Obama :unamused:")))
 
 (defn --user-perm 
-    "Updates a user's (permission) level by Slack @id. 
-    Allowed values for new-level are: 'User' or 'Admin' (case-insensitive). 
-    If new-level is omitted, this function will default to 'User'."
+    "Admin command. Updates a user's (permission) level by Slack @id. 
+     Allowed values for new-level are: 'User' or 'Admin' (case-insensitive). 
+     If new-level is omitted, this function will default to 'User'."
     [request]
     (let [op-user-name (:user_name (:params request))
           command-text (:text (:params request))

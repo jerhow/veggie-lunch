@@ -4,14 +4,15 @@
   :license {:name "MIT License"
             :url "https://opensource.org/licenses/MIT"}
   :dependencies [[org.clojure/clojure "1.8.0"]
-                [compojure "1.5.1"]
-                [http-kit "2.2.0"]
-                [ring/ring-devel "1.5.0"]
-                [ring/ring-core "1.5.0"]
-                [ring/ring-defaults "0.2.1"]
-                [org.clojure/java.jdbc "0.6.1"]
-                [org.xerial/sqlite-jdbc "3.15.1"]
-                [yesql "0.5.3"]]
+                 [compojure "1.5.1"]
+                 [http-kit "2.2.0"]
+                 [ring/ring-devel "1.5.0"]
+                 [ring/ring-core "1.5.0"]
+                 [ring/ring-defaults "0.2.1"]
+                 [org.clojure/java.jdbc "0.6.1"]
+                 [org.xerial/sqlite-jdbc "3.15.1"]
+                 [clj-time "0.12.2"]
+                 [yesql "0.5.3"]]
   :main ^:skip-aot veggie-lunch.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}}

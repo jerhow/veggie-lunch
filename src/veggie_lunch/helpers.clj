@@ -15,7 +15,8 @@
                               "--user-add"
                               "--user-remove"
                               "--user-list"
-                              "--user-perm"]))
+                              "--user-perm"
+                              "--new-order"]))
 
 (defn dispatch 
   "Basically an internal router, since every request comes in on '/'. 
@@ -55,4 +56,10 @@
     "Pass it a Slack user name, get back a boolean answer"
     [slack-user-name]
     (let [rows (db/fetch-user-existence {:slack_user_name slack-user-name})]
+        (not (empty? rows))))
+
+(defn order-exists?
+    "Pass it a date string in YYYY-MM-DD format, get back a boolean answer"
+    [order-date]
+    (let [rows (db/fetch-order-existence {:order_date order-date})]
         (not (empty? rows))))

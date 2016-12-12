@@ -46,6 +46,9 @@ CREATE TABLE IF NOT EXISTS order_items (
     CONSTRAINT slack_user_name_unique UNIQUE (user_id, order_id)
 );
 
+-- name: create-index-order-date!
+CREATE UNIQUE INDEX 'ix-order-date' ON 'orders' ('order_date' ASC);
+
 -- name: create-table-user-level!
 CREATE TABLE user_level (
     id INTEGER PRIMARY KEY,
@@ -105,3 +108,13 @@ WHERE slack_user_name = :slack_user_name;
 UPDATE users
 SET level = :level
 WHERE slack_user_name = :slack_user_name;
+
+-- name: fetch-order-existence
+-- Just a SELECT on the given date string to see whether an order exists (a non-nil row)
+SELECT id
+FROM orders
+WHERE order_date = :order_date;
+
+-- name: create-order!
+INSERT INTO orders (vendor_name)
+VALUES (:vendor_name);

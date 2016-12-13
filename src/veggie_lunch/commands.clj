@@ -14,9 +14,6 @@
 (defn --help [request]
     (str "TODO: Fill out the --help documentation"))
 
-(defn --list [request]
-    (str "TODO: --list"))
-
 (defn --lock 
     "Locks the current order"
     [request]
@@ -124,7 +121,7 @@
                         (str "Today's order successfully added aww yea")
                         (str "Oops, something went wrong :disappointed: \n"
                             "New order not added.\nThanks Obama :unamused:"))))
-            
+
             (str "Oops, only Admins can issue this command.\nThanks Obama :unamused:"))))
 
 (defn --user-add 
@@ -170,6 +167,26 @@
             (str "Oops, this user doesn't exist, so there's nothing to remove.\nThanks Obama :unamused:"))
 
         (str "Oops, only Admins can issue this command.\nThanks Obama :unamused:"))))
+
+(defn --list 
+    "List out the requested items in the current order.
+     TODO: Refactor this to allow passing in a date for previous orders."
+    [request]
+    (if (helpers/order-exists? (helpers/todays-date))
+        
+        (let [rows (db/fetch-order-items {:order_date (helpers/todays-date)})
+              vendor-name (:vendor_name (first rows))
+              menu-url (:menu_url (first rows))
+              locked (:locked (first rows))
+              order-items (join (map helpers/stringify-order-item-row rows))]
+              (str "=== TODAY'S ORDER ===\n"
+                   "Date: " (helpers/todays-date) "\n"
+                   "Vendor: " vendor-name "\n"
+                   "Menu: " menu-url "\n\n"
+                   order-items
+                   "=== " (count rows) " items requested ===\n"))
+
+        (str "There is no current order in the system :disappointed: \nThanks Obama :unamused:")))
 
 (defn --user-list 
     "Admin command. Fetches users from DB; returns results as a string, formatted for Slack"

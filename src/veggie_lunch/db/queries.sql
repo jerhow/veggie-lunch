@@ -156,3 +156,20 @@ WHERE order_date = :order_date;
 UPDATE orders
 SET locked = 0
 WHERE order_date = :order_date;
+
+-- name: fetch-order-items
+-- Fetches the list of order items for a given date
+SELECT 
+    o.vendor_name, o.menu_url, o.locked,
+    u.slack_user_name, u.full_name, 
+    oi.description
+FROM
+    orders AS o 
+    INNER JOIN order_items AS oi 
+        ON o.id = oi.order_id
+    INNER JOIN users AS u 
+        ON u.id = oi.user_id
+WHERE 
+    o.order_date = :order_date
+ORDER BY
+    u.full_name ASC;

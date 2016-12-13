@@ -13,7 +13,12 @@
                  [org.xerial/sqlite-jdbc "3.15.1"]
                  [clj-time "0.12.2"]
                  [yesql "0.5.3"]]
+  
+  ; Still working out the ideal options here:
   :main ^:skip-aot veggie-lunch.core
+  ; :main veggie-lunch.core
+  ; :aot [veggie-lunch.core]
+
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}}
   :source-paths ["src" "src/veggie_lunch" "src/veggie_lunch/db"])

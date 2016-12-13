@@ -1,4 +1,5 @@
 (ns veggie-lunch.core
+  (:gen-class)
   (:require [veggie-lunch.middleware :as middleware]
             [veggie-lunch.controllers :as controllers]
             [compojure.core :refer :all]

@@ -113,16 +113,19 @@
           command-text-parts (split command-text #" ")
           vendor-name (join " " (rest command-text-parts))]
 
-      (if (helpers/user-is-admin? op-user-name)
+        (if (helpers/user-is-admin? op-user-name)
 
-        (if (helpers/order-exists? (helpers/todays-date))
-            (str "There is already an order in the system for today.\nThanks Obama :unamused:")
-            (if (try (db/create-order! {:vendor_name vendor-name}) (catch Exception e))
-                (str "Today's order successfully added aww yea")
-                (str "Oops, something went wrong :disappointed: \n"
-                    "New order not added.\nThanks Obama :unamused:")))
+            (if (= vendor-name "")
+                (str "Oops, you need to supply a vendor name to create an order :blush: \nThanks Obama :unamused:")
 
-        (str "Oops, only Admins can issue this command.\nThanks Obama :unamused:"))))
+                (if (helpers/order-exists? (helpers/todays-date))
+                    (str "There is already an order in the system for today.\nThanks Obama :unamused:")
+                    (if (try (db/create-order! {:vendor_name vendor-name}) (catch Exception e))
+                        (str "Today's order successfully added aww yea")
+                        (str "Oops, something went wrong :disappointed: \n"
+                            "New order not added.\nThanks Obama :unamused:"))))
+            
+            (str "Oops, only Admins can issue this command.\nThanks Obama :unamused:"))))
 
 (defn --user-add 
     "Admin command. Add a user to the system."

@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS orders (
     order_date TEXT DEFAULT (strftime('%Y-%m-%d', 'now')) NOT NULL,
     vendor_name TEXT NOT NULL DEFAULT (''),
     menu_url TEXT NOT NULL DEFAULT (''),
+    locked INTEGER NOT NULL DEFAULT (0),
     CONSTRAINT slack_user_name_unique UNIQUE (order_date, vendor_name)
 );
 
@@ -142,4 +143,10 @@ SELECT CASE menu_url
     ELSE menu_url END 
     AS menu_url
 FROM orders
+WHERE order_date = :order_date;
+
+-- name: lock-order!
+-- Sets the locked field to true for a given order
+UPDATE orders
+SET locked = 1
 WHERE order_date = :order_date;

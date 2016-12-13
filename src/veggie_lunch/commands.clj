@@ -17,8 +17,15 @@
 (defn --list [request]
     (str "TODO: --list"))
 
-(defn --lock [request]
-    (str "TODO: --lock"))
+(defn --lock 
+    "Locks the current order"
+    [request]
+    (let [op-user-name (:user_name (:params request))]
+        (if (helpers/user-is-admin? op-user-name)
+            (if (try (db/lock-order! {:order_date (helpers/todays-date)}) (catch Exception e))
+                (str "Today's order locked.\n:thumbs_up:")
+                (str "Oops, something went wrong :disappointed: \nOrder not locked.\nThanks Obama :unamused:"))
+            (str "Oops, only Admins can issue this command.\nThanks Obama :unamused:"))))
 
 (defn --unlock [request]
     (str "TODO: --unlock"))

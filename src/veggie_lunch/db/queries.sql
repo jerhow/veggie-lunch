@@ -146,7 +146,13 @@ FROM orders
 WHERE order_date = :order_date;
 
 -- name: lock-order!
--- Sets the locked field to true for a given order
+-- Sets the locked field to true (1) for a given order
 UPDATE orders
 SET locked = 1
+WHERE order_date = :order_date;
+
+-- name: unlock-order!
+-- Sets the locked field to false (0) for a given order
+UPDATE orders
+SET locked = 0
 WHERE order_date = :order_date;

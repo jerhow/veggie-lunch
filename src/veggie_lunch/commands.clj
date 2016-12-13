@@ -27,8 +27,15 @@
                 (str "Oops, something went wrong :disappointed: \nOrder not locked.\nThanks Obama :unamused:"))
             (str "Oops, only Admins can issue this command.\nThanks Obama :unamused:"))))
 
-(defn --unlock [request]
-    (str "TODO: --unlock"))
+(defn --unlock 
+    "Unlocks the current order"
+    [request]
+    (let [op-user-name (:user_name (:params request))]
+        (if (helpers/user-is-admin? op-user-name)
+            (if (try (db/unlock-order! {:order_date (helpers/todays-date)}) (catch Exception e))
+                (str "Today's order unlocked.\n:thumbs_up:")
+                (str "Oops, something went wrong :disappointed: \nOrder not unlocked.\nThanks Obama :unamused:"))
+            (str "Oops, only Admins can issue this command.\nThanks Obama :unamused:"))))
 
 (defn --menu 
     "Returns the menu URL (or default value) from the current order"

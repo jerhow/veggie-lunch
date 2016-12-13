@@ -17,9 +17,6 @@
 (defn --list [request]
     (str "TODO: --list"))
 
-(defn --delete [request]
-    (str "TODO: --delete"))
-
 (defn --menu [request]
     (str "TODO: --menu"))
 
@@ -44,6 +41,22 @@
                 {:user_id slack-user-name :order_id order-id :order_text order-text}) (catch Exception e))
                 (str "Order written successfully aww yea")
                 (str "Oops, something went wrong :disappointed: \nOrder item not added.\nThanks Obama :unamused:"))
+
+            (str "Oops, something went wrong :disappointed: \n" 
+                "There is no current order in the system for today.\n"
+                "Please ask an Admin to start today's order, then try again.\n"
+                "Thanks Obama :unamused:"))))
+
+(defn --delete 
+    "How a user removes their item from the current order"
+    [request]
+    (let [op-user-name (:user_name (:params request))]
+
+        (if (helpers/order-exists? (helpers/todays-date))
+            (if (try (db/delete-order-item! {:slack_user_name op-user-name :order_date (helpers/todays-date)}) 
+                    (catch Exception e))
+                (str "Order deleted successfully aww yea")
+                (str "Oops, something went wrong :disappointed: \nOrder item not deleted.\nThanks Obama :unamused:"))
 
             (str "Oops, something went wrong :disappointed: \n" 
                 "There is no current order in the system for today.\n"

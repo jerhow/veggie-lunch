@@ -128,3 +128,8 @@ WHERE order_date = :order_date;
 -- Upsert's (sort of) a user's order_item for the current order
 INSERT OR REPLACE INTO order_items (user_id, order_id, description) 
 VALUES (:user_id, :order_id, :order_text);
+
+-- name: delete-order-item!
+DELETE FROM order_items
+WHERE user_id = (SELECT id FROM users WHERE slack_user_name = :slack_user_name)
+AND order_id = (SELECT id FROM orders WHERE order_date = :order_date);

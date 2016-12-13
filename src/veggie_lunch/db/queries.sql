@@ -133,3 +133,13 @@ VALUES (:user_id, :order_id, :order_text);
 DELETE FROM order_items
 WHERE user_id = (SELECT id FROM users WHERE slack_user_name = :slack_user_name)
 AND order_id = (SELECT id FROM orders WHERE order_date = :order_date);
+
+-- name: fetch-menu-url
+-- Gets the menu URL for the current order (if there is one)
+SELECT CASE menu_url 
+    WHEN '' 
+    THEN 'Oops, no menu has been assigned to today`s order. Thanks Obama :unamused:' 
+    ELSE menu_url END 
+    AS menu_url
+FROM orders
+WHERE order_date = :order_date;

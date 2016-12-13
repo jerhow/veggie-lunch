@@ -17,14 +17,18 @@
 (defn --list [request]
     (str "TODO: --list"))
 
-(defn --menu [request]
-    (str "TODO: --menu"))
-
 (defn --lock [request]
     (str "TODO: --lock"))
 
 (defn --unlock [request]
     (str "TODO: --unlock"))
+
+(defn --menu 
+    "Returns the menu URL (or default value) from the current order"
+    [request]
+    (if (helpers/order-exists? (helpers/todays-date))
+        (let [result (db/fetch-menu-url {:order_date (helpers/todays-date)})]
+            (:menu_url (first result)))))
 
 (defn --order 
     "How a user adds an item to the current order"

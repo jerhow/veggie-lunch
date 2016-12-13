@@ -8,31 +8,56 @@
 ; by the dispatcher, meaning you need to pick out anything you may need 
 ; from within your command's specific implementation.
 
+; ================
+; User commands:
+; ================
 (defn --about [request]
     (str "Veggie-Lunch version " (:app-version request)))
+
+(defn --delete 
+    "How a user removes their item from the current order."
+    [request]
+    (let [op-user-name (:user_name (:params request))]
+
+        (if (helpers/order-exists? (helpers/todays-date))
+            (if (try (db/delete-order-item! {:slack_user_name op-user-name :order_date (helpers/todays-date)}) 
+                    (catch Exception e))
+                (str "Order deleted successfully aww yea")
+                (str "Oops, something went wrong :disappointed: \nOrder item not deleted.\nThanks Obama :unamused:"))
+
+            (str "Oops, something went wrong :disappointed: \n" 
+                "There is no current order in the system for today.\n"
+                "Please ask an Admin to start today's order, then try again.\n"
+                "Thanks Obama :unamused:"))))
 
 (defn --help [request]
     (str "TODO: Fill out the --help documentation"))
 
-(defn --lock 
-    "Locks the current order"
-    [request]
-    (let [op-user-name (:user_name (:params request))]
-        (if (helpers/user-is-admin? op-user-name)
-            (if (try (db/lock-order! {:order_date (helpers/todays-date)}) (catch Exception e))
-                (str "Today's order locked.\n:thumbs_up:")
-                (str "Oops, something went wrong :disappointed: \nOrder not locked.\nThanks Obama :unamused:"))
-            (str "Oops, only Admins can issue this command.\nThanks Obama :unamused:"))))
+(defn --list 
+    "List out the requested items in a given order.
+     If no argument is passed in, we default to the current date.
+     Alternatively, if a YYYY-MM-DD formatted date string is passed in,
+     we will fetch the order from that date (if one exists)."
+    [request]        
+    (let [op-user-name (:user_name (:params request))
+          command-text (:text (:params request))
+          command-text-parts (split command-text #" ")
+          order-date (if (nil? (second command-text-parts)) (helpers/todays-date) (second command-text-parts))
+          rows (try (db/fetch-order-items {:order_date order-date}) (catch Exception e))
+          vendor-name (:vendor_name (first rows))
+          menu-url (:menu_url (first rows))
+          status (:status (first rows))
+          order-items (join (map helpers/stringify-order-item-row rows))]
 
-(defn --unlock 
-    "Unlocks the current order"
-    [request]
-    (let [op-user-name (:user_name (:params request))]
-        (if (helpers/user-is-admin? op-user-name)
-            (if (try (db/unlock-order! {:order_date (helpers/todays-date)}) (catch Exception e))
-                (str "Today's order unlocked.\n:thumbs_up:")
-                (str "Oops, something went wrong :disappointed: \nOrder not unlocked.\nThanks Obama :unamused:"))
-            (str "Oops, only Admins can issue this command.\nThanks Obama :unamused:"))))
+        (if (helpers/order-exists? order-date)
+            (str "=== TODAY'S ORDER ===\n"
+                 "Date: " order-date "\n"
+                 "Vendor: " vendor-name "\n"
+                 "Menu: " menu-url "\n"
+                 "Status: " status "\n\n"
+                 order-items
+                 "=== " (count rows) " items requested\n")
+            (str "Oops, no order found :disappointed: \nThanks Obama :unamused:"))))
 
 (defn --menu 
     "Returns the menu URL (or default value) from the current order"
@@ -42,7 +67,7 @@
             (:menu_url (first result)))))
 
 (defn --order 
-    "How a user adds an item to the current order"
+    "How a user adds an item to the current order."
     [request]
     (let [op-user-name (:user_name (:params request))
           command-text (:text (:params request))
@@ -62,21 +87,28 @@
                 "Please ask an Admin to start today's order, then try again.\n"
                 "Thanks Obama :unamused:"))))
 
-(defn --delete 
-    "How a user removes their item from the current order"
+; ================
+; Admin commands:
+; ================
+(defn --lock 
+    "Admin command. Locks the current order."
     [request]
     (let [op-user-name (:user_name (:params request))]
+        (if (helpers/user-is-admin? op-user-name)
+            (if (try (db/lock-order! {:order_date (helpers/todays-date)}) (catch Exception e))
+                (str "Today's order locked.\n:thumbs_up:")
+                (str "Oops, something went wrong :disappointed: \nOrder not locked.\nThanks Obama :unamused:"))
+            (str "Oops, only Admins can issue this command.\nThanks Obama :unamused:"))))
 
-        (if (helpers/order-exists? (helpers/todays-date))
-            (if (try (db/delete-order-item! {:slack_user_name op-user-name :order_date (helpers/todays-date)}) 
-                    (catch Exception e))
-                (str "Order deleted successfully aww yea")
-                (str "Oops, something went wrong :disappointed: \nOrder item not deleted.\nThanks Obama :unamused:"))
-
-            (str "Oops, something went wrong :disappointed: \n" 
-                "There is no current order in the system for today.\n"
-                "Please ask an Admin to start today's order, then try again.\n"
-                "Thanks Obama :unamused:"))))
+(defn --unlock 
+    "Admin command. Unlocks the current order."
+    [request]
+    (let [op-user-name (:user_name (:params request))]
+        (if (helpers/user-is-admin? op-user-name)
+            (if (try (db/unlock-order! {:order_date (helpers/todays-date)}) (catch Exception e))
+                (str "Today's order unlocked.\n:thumbs_up:")
+                (str "Oops, something went wrong :disappointed: \nOrder not unlocked.\nThanks Obama :unamused:"))
+            (str "Oops, only Admins can issue this command.\nThanks Obama :unamused:"))))
 
 (defn --set-menu-url 
     "Admin command. Set the menu URL for today's order."
@@ -163,32 +195,6 @@
 
             (str "Oops, only Admins can issue this command.\nThanks Obama :unamused:"))))
 
-(defn --list 
-    "List out the requested items in a given order.
-     If no argument is passed in, we default to the current date.
-     Alternatively, if a YYYY-MM-DD formatted date string is passed in,
-     we will fetch the order from that date (if one exists)."
-    [request]        
-    (let [op-user-name (:user_name (:params request))
-          command-text (:text (:params request))
-          command-text-parts (split command-text #" ")
-          order-date (if (nil? (second command-text-parts)) (helpers/todays-date) (second command-text-parts))
-          rows (try (db/fetch-order-items {:order_date order-date}) (catch Exception e))
-          vendor-name (:vendor_name (first rows))
-          menu-url (:menu_url (first rows))
-          status (:status (first rows))
-          order-items (join (map helpers/stringify-order-item-row rows))]
-
-        (if (helpers/order-exists? order-date)
-            (str "=== TODAY'S ORDER ===\n"
-                 "Date: " order-date "\n"
-                 "Vendor: " vendor-name "\n"
-                 "Menu: " menu-url "\n"
-                 "Status: " status "\n\n"
-                 order-items
-                 "=== " (count rows) " items requested\n")
-            (str "Oops, no order found :disappointed: \nThanks Obama :unamused:"))))
-
 (defn --user-list 
     "Admin command. Fetches users from DB; returns results as a string, formatted for Slack"
     [request]
@@ -197,7 +203,7 @@
         (str "Oops, only Admins can issue this command.\nThanks Obama :unamused:")))
 
 (defn --user-status
-    "Update the status of a user in the DB"
+    "Admin command. Update the status of a user in the DB."
     [request]
     (let [op-user-name (:user_name (:params request))
           command-text (:text (:params request))

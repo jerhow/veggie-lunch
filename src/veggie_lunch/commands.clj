@@ -133,16 +133,14 @@
           slack-user-name (second command-text-parts)
           full-name (join " " (next (next command-text-parts)))]
           
-      ; These nested if's are kind of gross. Perhaps I can figure out something more Clojure-idiomatic later.
-      ; TODO: Refactor this.
-      (if (helpers/user-is-admin? op-user-name)
+        (if (helpers/user-is-admin? op-user-name)
         
-        (if (try (db/user-add! {:slack_user_name slack-user-name :full_name full-name}) (catch Exception e))
-          (str "User added: " slack-user-name " (" full-name ")\n:thumbs_up:")
-          (str "Oops, something went wrong :disappointed: \n"
-            "User " slack-user-name " (" full-name ") not added.\nThanks Obama :unamused:"))
+            (if (try (db/user-add! {:slack_user_name slack-user-name :full_name full-name}) (catch Exception e))
+                (str "User added: " slack-user-name " (" full-name ")\n:thumbs_up:")
+                (str "Oops, something went wrong :disappointed: \n"
+                    "User " slack-user-name " (" full-name ") not added.\nThanks Obama :unamused:"))
 
-        (str "Oops, only Admins can issue this command.\nThanks Obama :unamused:"))))
+            (str "Oops, only Admins can issue this command.\nThanks Obama :unamused:"))))
 
 (defn --user-remove 
     "Admin command. Delete a user from the system by Slack user name (@name)"
@@ -152,21 +150,18 @@
           command-text-parts (split command-text #" ")
           slack-user-name (second command-text-parts)]
           
-      ; Hmm, I thought the nested if's were gross in --user-add.
-      ; This is even worse. This seems obviously non-idiomatic, but for now it works.
-      ; TODO: Refactor this.
-      (if (helpers/user-is-admin? op-user-name)
+        (if (helpers/user-is-admin? op-user-name)
 
-        (if (helpers/user-exists? slack-user-name)
+            (if (helpers/user-exists? slack-user-name)
 
-            (if (try (db/user-remove! {:slack_user_name slack-user-name}) (catch Exception e))
-                (str "User " slack-user-name " removed\n:thumbs_up:")
-                (str "Oops, something went wrong :disappointed: \n"
-                    "User " slack-user-name " not removed.\nThanks Obama :unamused:"))
+                (if (try (db/user-remove! {:slack_user_name slack-user-name}) (catch Exception e))
+                    (str "User " slack-user-name " removed\n:thumbs_up:")
+                    (str "Oops, something went wrong :disappointed: \n"
+                        "User " slack-user-name " not removed.\nThanks Obama :unamused:"))
 
-            (str "Oops, this user doesn't exist, so there's nothing to remove.\nThanks Obama :unamused:"))
+                (str "Oops, this user doesn't exist, so there's nothing to remove.\nThanks Obama :unamused:"))
 
-        (str "Oops, only Admins can issue this command.\nThanks Obama :unamused:"))))
+            (str "Oops, only Admins can issue this command.\nThanks Obama :unamused:"))))
 
 (defn --list 
     "List out the requested items in a given order.
@@ -214,21 +209,20 @@
           new-level (nth command-text-parts 2 "User")
           new-level-int (if (= (lower-case new-level) "admin") 2 1)]
           
-      ; TODO: If you're going to refactor the cases above, you must do this one,
-      ; as we're up to 4 levels (!) of nested if's. Barf.
-      (if (helpers/user-is-admin? op-user-name)
+        (if (helpers/user-is-admin? op-user-name)
 
-        (if (contains? level-whitelist (lower-case new-level))
+            (if (contains? level-whitelist (lower-case new-level))
 
-            (if (helpers/user-exists? slack-user-name)
+                (if (helpers/user-exists? slack-user-name)
 
-                (if (try (db/user-perm! {:slack_user_name slack-user-name :level new-level-int}) (catch Exception e))
-                    (str "User " slack-user-name " changed to " (capitalize new-level) "\n:thumbs_up:")
-                    (str "Oops, something went wrong :disappointed: \n"
-                        "User " slack-user-name " was not changed.\nThanks Obama :unamused:"))
+                    (if (try (db/user-perm! {:slack_user_name slack-user-name :level new-level-int}) 
+                        (catch Exception e))
+                        (str "User " slack-user-name " changed to " (capitalize new-level) "\n:thumbs_up:")
+                        (str "Oops, something went wrong :disappointed: \n"
+                            "User " slack-user-name " was not changed.\nThanks Obama :unamused:"))
 
-                (str "Oops, this user doesn't exist, so there's nothing to remove.\nThanks Obama :unamused:"))
+                    (str "Oops, this user doesn't exist, so there's nothing to remove.\nThanks Obama :unamused:"))
 
-            (str "Oops, you can't change a user to that.\nThanks Obama :unamused:"))
+                (str "Oops, you can't change a user to that.\nThanks Obama :unamused:"))
 
-        (str "Oops, only Admins can issue this command.\nThanks Obama :unamused:"))))
+            (str "Oops, only Admins can issue this command.\nThanks Obama :unamused:"))))

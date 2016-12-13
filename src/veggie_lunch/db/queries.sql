@@ -160,7 +160,8 @@ WHERE order_date = :order_date;
 -- name: fetch-order-items
 -- Fetches the list of order items for a given date
 SELECT 
-    o.vendor_name, o.menu_url, o.locked,
+    o.vendor_name, o.menu_url, 
+    CASE o.locked WHEN 1 THEN 'LOCKED' ELSE 'OPEN' END AS status,
     u.slack_user_name, u.full_name, 
     oi.description
 FROM

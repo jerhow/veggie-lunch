@@ -177,14 +177,15 @@
         (let [rows (db/fetch-order-items {:order_date (helpers/todays-date)})
               vendor-name (:vendor_name (first rows))
               menu-url (:menu_url (first rows))
-              locked (:locked (first rows))
+              status (:status (first rows))
               order-items (join (map helpers/stringify-order-item-row rows))]
               (str "=== TODAY'S ORDER ===\n"
                    "Date: " (helpers/todays-date) "\n"
                    "Vendor: " vendor-name "\n"
-                   "Menu: " menu-url "\n\n"
+                   "Menu: " menu-url "\n"
+                   "Status: " status "\n\n"
                    order-items
-                   "=== " (count rows) " items requested ===\n"))
+                   "=== " (count rows) " items requested\n"))
 
         (str "There is no current order in the system :disappointed: \nThanks Obama :unamused:")))
 

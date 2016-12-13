@@ -18,6 +18,7 @@
                               "--user-remove"
                               "--user-list"
                               "--user-perm"
+                              "--user-status"
                               "--new-order"]))
 
 (defn dispatch 

@@ -174,3 +174,9 @@ WHERE
     o.order_date = :order_date
 ORDER BY
     u.full_name ASC;
+
+-- name: update-user-status!
+-- By 'status', we mean Active/Inactive, which we store as a boolean integer for 'active'
+UPDATE users
+SET active = :active_status
+WHERE slack_user_name = :slack_user_name;

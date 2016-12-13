@@ -196,6 +196,36 @@
         (let [users (db/user-list)] (join (map helpers/stringify-users-row users)))
         (str "Oops, only Admins can issue this command.\nThanks Obama :unamused:")))
 
+(defn --user-status
+    "Update the status of a user in the DB"
+    [request]
+    (let [op-user-name (:user_name (:params request))
+          command-text (:text (:params request))
+          command-text-parts (split command-text #" ")
+          slack-user-name (nth command-text-parts 1 "")
+          status-whitelist #{"active" "inactive"} ; <- a set
+          new-status (nth command-text-parts 2 "active")
+          new-status-int (if (= (lower-case new-status) "active") 1 0)
+          ]
+
+        (if (helpers/user-is-admin? op-user-name)
+        
+            (if (contains? status-whitelist (lower-case new-status))
+
+                (if (helpers/user-exists? slack-user-name)
+
+                    (if (try (db/update-user-status! {:slack_user_name slack-user-name :active_status new-status-int}) 
+                        (catch Exception e))
+                        (str "User " slack-user-name " changed to '" (capitalize new-status) "'\n:thumbs_up:")
+                        (str "Oops, something went wrong :disappointed: \n"
+                            "Status for user " slack-user-name " was not changed.\nThanks Obama :unamused:"))
+
+                    (str "Oops, this user doesn't exist.\nThanks Obama :unamused:"))
+
+                (str "Oops, you can't update a user's status to that.\nThanks Obama :unamused:"))
+
+            (str "Oops, only Admins can issue this command.\nThanks Obama :unamused:"))))
+
 (defn --user-perm 
     "Admin command. Updates a user's (permission) level by Slack @id. 
      Allowed values for new-level are: 'User' or 'Admin' (case-insensitive). 
@@ -221,7 +251,7 @@
                         (str "Oops, something went wrong :disappointed: \n"
                             "User " slack-user-name " was not changed.\nThanks Obama :unamused:"))
 
-                    (str "Oops, this user doesn't exist, so there's nothing to remove.\nThanks Obama :unamused:"))
+                    (str "Oops, this user doesn't exist.\nThanks Obama :unamused:"))
 
                 (str "Oops, you can't change a user to that.\nThanks Obama :unamused:"))
 

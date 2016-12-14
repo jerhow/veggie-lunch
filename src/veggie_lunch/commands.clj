@@ -45,10 +45,10 @@
             (str "veggie-lunch is a tool for blah blah blah.\n\n"
                  "Several commands are available:"
                  (join "\n" (sort helpers/permitted-commands))
-                 (str "\n\nNOTE: Commands always start with '--'")
-                 (str "\n\nRun /veggie-lunch --help $COMMAND for details.")
-                 (str "\nFor example, to get help for the --menu command:\n")
-                 (str "`/veggie-lunch --help --menu`"))
+                 "\n\nNOTE: Commands always start with '--'"
+                 "\n\nRun /veggie-lunch --help $COMMAND for details."
+                 "\nFor example, to get help for the --menu command:\n"
+                 "`/veggie-lunch --help --menu`")
             ((keyword (subs requested-help-command 2)) helpers/help-docs))))
 
 (defn --list 

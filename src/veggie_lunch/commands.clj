@@ -30,8 +30,26 @@
                 "Please ask an Admin to start today's order, then try again.\n"
                 "Thanks Obama :unamused:"))))
 
-(defn --help [request]
-    (str "TODO: Fill out the --help documentation"))
+(defn --help 
+    "Parses out the command for which help is being requested, 
+     and returns that entry from the helpers/help-docs hashmap.
+     If no command is passed in, we just output the top-level
+     messaging, which lists the available commands and explains
+     how to get help for them."
+    [request]
+    (let [op-user-name (:user_name (:params request))
+          command-text (:text (:params request))
+          command-text-parts (split command-text #" ")
+          requested-help-command (nth command-text-parts 1 "--none")]
+        (if (= requested-help-command "--none")
+            (str "veggie-lunch is a tool for blah blah blah.\n\n"
+                 "Several commands are available:"
+                 (join "\n" (sort helpers/permitted-commands))
+                 (str "\n\nNOTE: Commands always start with '--'")
+                 (str "\n\nRun /veggie-lunch --help $COMMAND for details.")
+                 (str "\nFor example, to get help for the --menu command:\n")
+                 (str "`/veggie-lunch --help --menu`"))
+            ((keyword (subs requested-help-command 2)) helpers/help-docs))))
 
 (defn --list 
     "List out the requested items in a given order.

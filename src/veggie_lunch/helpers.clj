@@ -6,20 +6,55 @@
 
 (def permitted-commands (set ["" 
                               "--about" 
+                              "--delete" 
                               "--help" 
                               "--list" 
-                              "--order" 
-                              "--delete" 
+                              "--lock" 
                               "--menu" 
-                              "--lock"
-                              "--unlock"
+                              "--new-order" 
+                              "--order" 
                               "--set-menu-url"
+                              "--unlock"
                               "--user-add"
                               "--user-remove"
                               "--user-list"
                               "--user-perm"
-                              "--user-status"
-                              "--new-order"]))
+                              "--user-status"]))
+
+(def help-docs {:help           (str "/veggie-lunch --help [command]\n"
+                                     "Displays a general README about how to use the command")
+                :list           (str "/veggie-lunch --list [date] \n"
+                                     "Lists the entire current order (defaults to current date) \n"
+                                     "Provide an optional date to view a previous order (MM/DD/YYYY) \n")
+                :order          (str "/veggie-lunch --order Whatever thing you are ordering\n"
+                                     "Writes your order to today's list.\n"
+                                     "No quotes needed, and spaces are fine.\n"
+                                     "Anything you write after the command is part of the order text.\n")
+                :delete         (str "/veggie-lunch --delete\n"
+                                     "Removes your order from today's list\n")
+                :menu           (str "/veggie-lunch --menu\n"
+                                     "Returns a link to the online menu of the place we are ordering from "
+                                     "(if one exists).\n")
+                :lock           (str "/veggie-lunch --lock\n"
+                                     "Locks today's order (Admins only)\n")
+                :unlock         (str "/veggie-lunch --unlock\n"
+                                     "Unlocks today's order (Admins only)\n")
+                :set-menu-url   (str "/veggie-lunch --unlock\n"
+                                     "Unlocks today's order (Admins only)\n")
+                :user-add       (str "/veggie-lunch --user-add @slack-user full-name\n"
+                                     "Adds a user to the system, enabling them to order lunch (Admins only)\n")
+                :user-remove    (str "/veggie-lunch --user-remove @slack-user\n"
+                                     "Removes a user from the system (Admins only)\n")
+                :user-list      (str "/veggie-lunch --user-list\n"
+                                     "List all users the system (Admins only)\n")
+                :user-perm      (str "/veggie-lunch --user-perm @slack-user [Admin | User]\n"
+                                     "(Updates a user's permission level\n"
+                                     "Possible values are *Admin* or *User*\n")
+                :user-status    (str "/veggie-lunch --user-status @slack-user [Active | Inactive]\n"
+                                     "Updates a user's status\n"
+                                     "Possible values are *Active* or *Inactive*\n")
+                :new-order      (str "/veggie-lunch --new-order vendor-name\n"
+                                     "Create today's list (Admins only)\n")})
 
 (defn dispatch 
   "Basically an internal router, since every request comes in on '/'. 

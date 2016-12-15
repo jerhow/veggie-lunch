@@ -56,6 +56,8 @@
                 :new-order      (str "/veggie-lunch --new-order vendor-name\n"
                                      "Create today's list (Admins only)\n")})
 
+(def emoji [":pig:" ":cow:" ":chicken:" ":rabbit:" ":octopus:" ":hatched_chick:"])
+
 (defn dispatch 
   "Basically an internal router, since every request comes in on '/'. 
    We dynamically resolve the command's corresponding function name 
@@ -65,6 +67,19 @@
   [request command]
 
   ((ns-resolve 'veggie-lunch.commands (symbol command)) request))
+
+(defn fetch-user-id
+    "Pass in a Slack user_name, get back their ID from the users table"
+    [slack-user-name]
+    (let [rows (db/fetch-user-existence {:slack_user_name slack-user-name})]
+        (if (empty? rows)
+            -1
+            (:id (first rows)))))
+
+(defn random-emoji
+    ""
+    []
+    (rand-nth emoji))
 
 (defn stringify-users-row 
     "Takes a row from the 'users' table and formats it for output in Slack"
@@ -90,6 +105,19 @@
                   :slack-user-name (first (next text-parts))
                   :full-name (next (next text-parts)))))
 
+(defn todays-date 
+    "Returns the date as a YYYY-MM-DD formatted string"
+    []
+    (first (str/split (time-coerce/to-string (time-core/today))  #"T")))
+
+(defn todays-order-id
+    "Returns the int ID of today's order, or -1 if it doesn't exist"
+    [order-date]
+    (let [rows (db/fetch-order-existence {:order_date order-date})]
+        (if (empty? rows)
+            -1
+            (:id (first rows)))))
+
 (defn user-is-admin? 
     "Pass it a Slack user name, get back a boolean answer"
     [slack-user-name]
@@ -107,24 +135,3 @@
     [order-date]
     (let [rows (db/fetch-order-existence {:order_date order-date})]
         (not (empty? rows))))
-
-(defn todays-date 
-    "Returns the date as a YYYY-MM-DD formatted string"
-    []
-    (first (str/split (time-coerce/to-string (time-core/today))  #"T")))
-
-(defn todays-order-id
-    "Returns the int ID of today's order, or -1 if it doesn't exist"
-    [order-date]
-    (let [rows (db/fetch-order-existence {:order_date order-date})]
-        (if (empty? rows)
-            -1
-            (:id (first rows)))))
-
-(defn fetch-user-id
-    "Pass in a Slack user_name, get back their ID from the users table"
-    [slack-user-name]
-    (let [rows (db/fetch-user-existence {:slack_user_name slack-user-name})]
-        (if (empty? rows)
-            -1
-            (:id (first rows)))))

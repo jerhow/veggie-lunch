@@ -11,8 +11,10 @@
 ; ================
 ; User commands:
 ; ================
-(defn --about [request]
-    (str "Veggie-Lunch version " (:app-version request)))
+(defn --about 
+    ""
+    [request]
+    (str ":pig: Veggie-lunch version " (:app-version request)))
 
 (defn --delete 
     "How a user removes their item from the current order."
@@ -50,6 +52,12 @@
                  "\nFor example, to get help for the --menu command:\n"
                  "`/veggie-lunch --help --menu`")
             ((keyword (subs requested-help-command 2)) helpers/help-docs))))
+
+(defn --none
+    "This command stands in when we have not been passed a legit command.
+     We just pass the request along to --help, and return the top-level messaging."
+    [request]
+    (--help request))
 
 (defn --list 
     "List out the requested items in a given order.

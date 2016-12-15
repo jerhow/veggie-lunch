@@ -4,7 +4,7 @@
               [clj-time.core :as time-core]
               [clj-time.coerce :as time-coerce]))
 
-(def permitted-commands (set ["" 
+(def permitted-commands (set ["--none" 
                               "--about" 
                               "--delete" 
                               "--help" 

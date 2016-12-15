@@ -2,7 +2,8 @@
     (:require [veggie-lunch.db.core :as db]
               [clojure.string :as str]
               [clj-time.core :as time-core]
-              [clj-time.coerce :as time-coerce]))
+              [clj-time.coerce :as time-coerce]
+              [clj-time.local :as time-local]))
 
 (def permitted-commands (set ["--none" 
                               "--about" 
@@ -58,6 +59,22 @@
                                      "Create today's list (Admins only)\n")})
 
 (def emoji [":pig:" ":cow:" ":chicken:" ":rabbit:" ":octopus:" ":hatched_chick:"])
+
+(defn current-time 
+    "Returns the time for UI display"
+    []
+    ; TODO: I'm stuck in GMT for some reason. Must fix this!
+    ; For now, I'm hacking it into being correct for the demo (see comment below)
+    (let [time-24 (str/replace 
+                (second (str/split (time-coerce/to-string (time-local/local-now))  #"T"))
+                #"\.\d{3}Z"
+                "")
+          time-24-parts (str/split time-24 #"\:")
+          hour (Integer/parseInt (first time-24-parts))
+          minute (second time-24-parts)
+          am-pm (if (> hour 12) "PM" "AM")
+          hour-fixed (- (if (> hour 12) (- hour 12) hour) 5)] ; <-- The time-zone hack is here (subtracting 5)
+        (str hour-fixed ":" minute " " am-pm)))
 
 (defn dispatch 
   "Basically an internal router, since every request comes in on '/'. 

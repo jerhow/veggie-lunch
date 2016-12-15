@@ -13,8 +13,7 @@
   (let [op-user-name (:user_name (:params request))
         text-field (:text (:params request))
         text-parts (str/split text-field #" ")
-        command (first text-parts)
-        command-no-dashes (str/replace command #"^\-\-" "")]
+        command (first text-parts)]
     
     (if (user-exists? op-user-name)
 

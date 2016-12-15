@@ -53,12 +53,6 @@
                  "`/veggie-lunch --help --menu`")
             ((keyword (subs requested-help-command 2)) helpers/help-docs))))
 
-(defn --none
-    "This command stands in when we have not been passed a legit command.
-     We just pass the request along to --help, and return the top-level messaging."
-    [request]
-    (--help request))
-
 (defn --list 
     "List out the requested items in a given order.
      If no argument is passed in, we default to the current date.
@@ -92,6 +86,12 @@
         (let [result (db/fetch-menu-url {:order_date (helpers/todays-date)})]
             (:menu_url (first result)))))
 
+(defn --none
+    "This command stands in when we have not been passed a legit command.
+     We just pass the request along to --help, and return the top-level messaging."
+    [request]
+    (--help request))
+
 (defn --order 
     "How a user adds an item to the current order."
     [request]
@@ -112,6 +112,21 @@
                 "There is no current order in the system for today.\n"
                 "Please ask an Admin to start today's order, then try again.\n"
                 "Thanks Obama :unamused:"))))
+
+(defn --status
+    "Find out what's going on in the system at a given moment.
+     Right now we're just telling the user whether there is a list
+     going yet today."
+    [request]
+    (let [todays-date (helpers/todays-date)
+          emoji (helpers/random-emoji)]
+        (if (helpers/order-exists? todays-date)
+            (str "\n" emoji " "
+                 "Welcome! A list has been started for today.\n"
+                 "Feel free to add your order to the list!\n"
+                 "Try `/veggie-lunch --help --order` if you need more information.")
+            (str "\nWelcome! A list has not yet been started today.\n"
+                 "_Where's an admin when you need one?_ :unamused:"))))
 
 ; ================
 ; Admin commands:

@@ -6,6 +6,7 @@
 
 (def permitted-commands (set ["--none" 
                               "--about" 
+                              "--status" 
                               "--delete" 
                               "--help" 
                               "--list" 

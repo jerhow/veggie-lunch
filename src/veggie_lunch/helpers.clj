@@ -90,13 +90,13 @@
         "Full Name: " (:full_name row) "\n"
         "Level: " (:level row) "\n"
         "Created: " (:created_dt row) "\n"
-        "Status: " (:active row)))
+        "Order is: " (:active row)))
 
 (defn stringify-order-item-row
     "Takes a row from db/fetch-order-items and formats it for output in Slack"
     [row]
-    (str "Name: " (:full_name row) " ("  (:slack_user_name row) ")\n"
-         "Item Requested: " (:description row) "\n\n"))
+    (str "Name: " (:full_name row) " (@"  (:slack_user_name row) ")\n"
+         "Item Requested: *" (:description row) "*\n\n"))
 
 (defn split-command-text 
     ""

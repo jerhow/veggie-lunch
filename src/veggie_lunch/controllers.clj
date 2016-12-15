@@ -1,6 +1,6 @@
 (ns veggie-lunch.controllers
   (:require [veggie-lunch.commands :as commands]
-            [veggie-lunch.helpers :refer [dispatch permitted-commands user-exists?]]
+            [veggie-lunch.helpers :refer [dispatch permitted-commands random-emoji user-exists?]]
             [ring.util.response :refer [response content-type status header]]
             [clojure.string :as str]))
 
@@ -21,6 +21,6 @@
         (response (dispatch request command))
         (header (response text-field) "status" "500 Error"))
 
-      (str "Oops, this user doesn't exist in our system.\n"
+      (str "\n" (random-emoji) " Oops, this user doesn't exist in our system.\n"
         "Please see an admin to be added.\n"
         "Thanks Obama :unamused:"))))

@@ -2,7 +2,7 @@
   (:require [veggie-lunch.db.core :as db]
             [veggie-lunch.helpers :as helpers]
             [ring.util.response :refer [response content-type status header]]
-            [clojure.string :refer [capitalize join lower-case split]]))
+            [clojure.string :as str]))
 
 ; NOTE: Remember that all of the commands automatically get passed the 'request' map
 ; by the dispatcher, meaning you need to pick out anything you may need 
@@ -43,12 +43,12 @@
     [request]
     (let [op-user-name (:user_name (:params request))
           command-text (:text (:params request))
-          command-text-parts (split command-text #" ")
+          command-text-parts (str/split command-text #" ")
           requested-help-command (nth command-text-parts 1 "--none")]
         (if (= requested-help-command "--none")
             (str "\n" (helpers/random-emoji) " *veggie-lunch* is a tool for blah blah blah.\n\n"
                  "Several commands are available:"
-                 (join "\n" (sort helpers/permitted-commands))
+                 (str/join "\n" (sort helpers/permitted-commands))
                  "\n\nNOTE: Commands always start with '--'"
                  "\n\nRun /veggie-lunch --help $COMMAND for details."
                  "\nFor example, to get help for the --menu command:\n"
@@ -63,13 +63,13 @@
     [request]        
     (let [op-user-name (:user_name (:params request))
           command-text (:text (:params request))
-          command-text-parts (split command-text #" ")
+          command-text-parts (str/split command-text #" ")
           order-date (if (nil? (second command-text-parts)) (helpers/todays-date) (second command-text-parts))
           rows (try (db/fetch-order-items {:order_date order-date}) (catch Exception e))
           vendor-name (:vendor_name (first rows))
           menu-url (:menu_url (first rows))
           status (:status (first rows))
-          order-items (join (map helpers/stringify-order-item-row rows))]
+          order-items (str/join (map helpers/stringify-order-item-row rows))]
 
         (if (helpers/order-exists? order-date)
             (str "\n" (helpers/random-emoji) " TODAY'S ORDER " (helpers/random-emoji) "\n"
@@ -99,8 +99,8 @@
     [request]
     (let [op-user-name (:user_name (:params request))
           command-text (:text (:params request))
-          command-text-parts (split command-text #" ")
-          order-text (join " " (rest command-text-parts))
+          command-text-parts (str/split command-text #" ")
+          order-text (str/join " " (rest command-text-parts))
           slack-user-name (helpers/fetch-user-id op-user-name)
           order-id (helpers/todays-order-id (helpers/todays-date))
           emoji (helpers/random-emoji)]
@@ -166,8 +166,8 @@
     [request]
     (let [op-user-name (:user_name (:params request))
           command-text (:text (:params request))
-          command-text-parts (split command-text #" ")
-          url (join " " (rest command-text-parts))
+          command-text-parts (str/split command-text #" ")
+          url (str/join " " (rest command-text-parts))
           emoji (helpers/random-emoji)]
 
       (if (helpers/user-is-admin? op-user-name)
@@ -191,8 +191,8 @@
     [request]
     (let [op-user-name (:user_name (:params request))
           command-text (:text (:params request))
-          command-text-parts (split command-text #" ")
-          vendor-name (join " " (rest command-text-parts))
+          command-text-parts (str/split command-text #" ")
+          vendor-name (str/join " " (rest command-text-parts))
           emoji (helpers/random-emoji)]
 
         (if (helpers/user-is-admin? op-user-name)
@@ -215,17 +215,17 @@
     [request]
     (let [op-user-name (:user_name (:params request))
           command-text (:text (:params request))
-          command-text-parts (split command-text #" ")
-          slack-user-name (second command-text-parts)
-          full-name (join " " (next (next command-text-parts)))
+          command-text-parts (str/split command-text #" ")
+          slack-user-name (str/replace (second command-text-parts) #"^\@" "")
+          full-name (str/join " " (next (next command-text-parts)))
           emoji (helpers/random-emoji)]
           
         (if (helpers/user-is-admin? op-user-name)
         
             (if (try (db/user-add! {:slack_user_name slack-user-name :full_name full-name}) (catch Exception e))
-                (str "\n" emoji " User added: " slack-user-name " (" full-name ")\n:thumbs_up:")
+                (str "\n" emoji " User added: @" slack-user-name " (" full-name ")\n:thumbs_up:")
                 (str "\n" emoji " Oops, something went wrong :disappointed: \n"
-                    "User " slack-user-name " (" full-name ") not added.\nThanks Obama :unamused:"))
+                    "User @" slack-user-name " (" full-name ") not added.\nThanks Obama :unamused:"))
 
             (str "\n" emoji " Oops, only Admins can issue this command.\nThanks Obama :unamused:"))))
 
@@ -234,8 +234,8 @@
     [request]
     (let [op-user-name (:user_name (:params request))
           command-text (:text (:params request))
-          command-text-parts (split command-text #" ")
-          slack-user-name (second command-text-parts)
+          command-text-parts (str/split command-text #" ")
+          slack-user-name (str/replace (second command-text-parts) #"^\@" "")
           emoji (helpers/random-emoji)]
           
         (if (helpers/user-is-admin? op-user-name)
@@ -243,7 +243,7 @@
             (if (helpers/user-exists? slack-user-name)
 
                 (if (try (db/user-remove! {:slack_user_name slack-user-name}) (catch Exception e))
-                    (str "\n" emoji " User " slack-user-name " removed\n:thumbs_up:")
+                    (str "\n" emoji " User @" slack-user-name " removed\n:thumbs_up:")
                     (str "\n" emoji " Oops, something went wrong :disappointed: \n"
                         "User " slack-user-name " not removed.\nThanks Obama :unamused:"))
 
@@ -255,7 +255,7 @@
     "Admin command. Fetches users from DB; returns results as a string, formatted for Slack"
     [request]
     (if (helpers/user-is-admin? (:user_name (:params request)))
-        (let [users (db/user-list)] (join (map helpers/stringify-users-row users)))
+        (let [users (db/user-list)] (str/join (map helpers/stringify-users-row users)))
         (str "\n" (helpers/random-emoji) " Oops, only Admins can issue this command.\nThanks Obama :unamused:")))
 
 (defn --user-status
@@ -263,22 +263,22 @@
     [request]
     (let [op-user-name (:user_name (:params request))
           command-text (:text (:params request))
-          command-text-parts (split command-text #" ")
+          command-text-parts (str/split command-text #" ")
           slack-user-name (nth command-text-parts 1 "")
           status-whitelist #{"active" "inactive"} ; <- a set
           new-status (nth command-text-parts 2 "active")
-          new-status-int (if (= (lower-case new-status) "active") 1 0)
+          new-status-int (if (= (str/lower-case new-status) "active") 1 0)
           emoji (helpers/random-emoji)]
 
         (if (helpers/user-is-admin? op-user-name)
         
-            (if (contains? status-whitelist (lower-case new-status))
+            (if (contains? status-whitelist (str/lower-case new-status))
 
                 (if (helpers/user-exists? slack-user-name)
 
                     (if (try (db/update-user-status! {:slack_user_name slack-user-name :active_status new-status-int}) 
                         (catch Exception e))
-                        (str "\n" emoji " User " slack-user-name " changed to '" (capitalize new-status) 
+                        (str "\n" emoji " User " slack-user-name " changed to '" (str/capitalize new-status) 
                              "'\n:thumbs_up:")
                         (str "\n" emoji " Oops, something went wrong :disappointed: \n"
                             "Status for user " slack-user-name " was not changed.\nThanks Obama :unamused:"))
@@ -296,22 +296,22 @@
     [request]
     (let [op-user-name (:user_name (:params request))
           command-text (:text (:params request))
-          command-text-parts (split command-text #" ")
+          command-text-parts (str/split command-text #" ")
           slack-user-name (nth command-text-parts 1 "")
           level-whitelist #{"admin" "user"} ; <- a set
           new-level (nth command-text-parts 2 "User")
-          new-level-int (if (= (lower-case new-level) "admin") 2 1)
+          new-level-int (if (= (str/lower-case new-level) "admin") 2 1)
           emoji (helpers/random-emoji)]
           
         (if (helpers/user-is-admin? op-user-name)
 
-            (if (contains? level-whitelist (lower-case new-level))
+            (if (contains? level-whitelist (str/lower-case new-level))
 
                 (if (helpers/user-exists? slack-user-name)
 
                     (if (try (db/user-perm! {:slack_user_name slack-user-name :level new-level-int}) 
                         (catch Exception e))
-                        (str "\n" emoji " User " slack-user-name " changed to " (capitalize new-level) "\n:thumbs_up:")
+                        (str "\n" emoji " User " slack-user-name " changed to " (str/capitalize new-level) "\n:thumbs_up:")
                         (str "\n" emoji " Oops, something went wrong :disappointed: \n"
                             "User " slack-user-name " was not changed.\nThanks Obama :unamused:"))
 

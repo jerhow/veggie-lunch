@@ -14,25 +14,30 @@
 (defn --about 
     ""
     [request]
-    (str "\n" (helpers/random-emoji) " Veggie-lunch version " (:app-version request)))
+    (str "\n" (helpers/random-emoji) " Veggie-lunch version " (:app-version request)
+         "\nSource: https://github.com/jerhow/veggie-lunch"))
 
 (defn --delete 
     "How a user removes their item from the current order."
     [request]
     (let [op-user-name (:user_name (:params request))
+          command-text (:text (:params request))
           emoji (helpers/random-emoji)]
 
         (if (helpers/order-exists? (helpers/todays-date))
             (if (try (db/delete-order-item! {:slack_user_name op-user-name :order_date (helpers/todays-date)}) 
                     (catch Exception e))
-                (str "\n" emoji " Order deleted successfully awww yea")
-                (str "\n" emoji " Oops, something went wrong :disappointed: "
+                (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
+                    "Order deleted successfully awww yea")
+                (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
+                     "Oops, something went wrong:"
                      "\nOrder item not deleted.\nThanks Obama :unamused:"))
 
-            (str "\n" emoji " Oops, something went wrong :disappointed: \n" 
-                "There is no current order in the system for today.\n"
-                "Please ask an Admin to start today's order, then try again.\n"
-                "Thanks Obama :unamused:"))))
+            (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
+                 "Oops, something went wrong :disappointed: \n" 
+                 "There is no current order in the system for today.\n"
+                 "Please ask an Admin to start today's order, then try again.\n"
+                 "Thanks Obama :unamused:"))))
 
 (defn --help 
     "Parses out the command for which help is being requested, 
@@ -46,8 +51,9 @@
           command-text-parts (str/split command-text #" ")
           requested-help-command (nth command-text-parts 1 "--none")]
         (if (= requested-help-command "--none")
-            (str "\n" (helpers/random-emoji) " *veggie-lunch* is a tool for blah blah blah.\n\n"
-                 "Several commands are available:"
+            (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
+                 "\nWelcome! *veggie-lunch* is a tool for blah blah blah\n\n"
+                 "Several commands are available:\n"
                  (str/join "\n" (sort helpers/permitted-commands))
                  "\n\nNOTE: Commands always start with '--'"
                  "\n\nRun /veggie-lunch --help $COMMAND for details."
@@ -72,14 +78,15 @@
           order-items (str/join (map helpers/stringify-order-item-row rows))]
 
         (if (helpers/order-exists? order-date)
-            (str "\n" (helpers/random-emoji) " TODAY'S ORDER " (helpers/random-emoji) "\n"
+            (str "\n\n`" command-text "`\n" 
+                 "\n" (helpers/random-emoji) " TODAY'S ORDER " (helpers/random-emoji) "\n"
                  "Date: " order-date "\n"
                  "Vendor: " vendor-name "\n"
                  "Menu: " menu-url "\n"
                  "Status: " status "\n\n"
                  order-items
-                 "=== " (count rows) " item(s) requested\n")
-            (str "\n" (helpers/random-emoji) " Oops, no order found :disappointed: \nThanks Obama :unamused:"))))
+                 "*TOTAL: " (count rows) " item(s) requested*\n")
+            (str "\n" (helpers/random-emoji) " Oops, no order found.\nThanks Obama :unamused:"))))
 
 (defn --menu 
     "Returns the menu URL (or default value) from the current order"
@@ -108,11 +115,14 @@
         (if (helpers/order-exists? (helpers/todays-date))
             (if (try (db/upsert-order-item! 
                 {:user_id slack-user-name :order_id order-id :order_text order-text}) (catch Exception e))
-                (str "\n" emoji " Order written successfully awww yea")
-                (str "\n" emoji " Oops, something went wrong :disappointed: "
+                (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
+                     "Order written successfully awww yea")
+                (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
+                     "Oops, something went wrong"
                      "\nOrder item not added.\nThanks Obama :unamused:"))
 
-            (str "\n" emoji  " Oops, something went wrong :disappointed: \n" 
+            (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
+                 "Oops, something went wrong\n" 
                  "There is no current order in the system for today.\n"
                  "Please ask an Admin to start today's order, then try again.\n"
                  "Thanks Obama :unamused:"))))
@@ -122,15 +132,16 @@
      Right now we're just telling the user whether there is a list
      going yet today."
     [request]
-    (let [todays-date (helpers/todays-date)
+    (let [command-text (:text (:params request))
+          todays-date (helpers/todays-date)
           emoji (helpers/random-emoji)]
         (if (helpers/order-exists? todays-date)
-            (str "\n" emoji " "
-                 "Welcome! A list has been started for today.\n"
+            (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
+                 "Welcome! A list *has* been started for today :tada:\n"
                  "Feel free to add your order to the list!\n"
                  "Try `/veggie-lunch --help --order` if you need more information.")
-            (str "\n" emoji " "
-                 "\nWelcome! A list has not yet been started today.\n"
+            (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
+                 "Welcome! Unfortunately, a list has not yet been started today.\n"
                  "_Where's an admin when you need one?_ :unamused:"))))
 
 ; ================
@@ -140,12 +151,15 @@
     "Admin command. Locks the current order."
     [request]
     (let [op-user-name (:user_name (:params request))
+          command-text (:text (:params request))
           emoji (helpers/random-emoji)]
         (if (helpers/user-is-admin? op-user-name)
             (if (try (db/lock-order! {:order_date (helpers/todays-date)}) (catch Exception e))
-                (str "\n" emoji " Today's order locked.\n:thumbs_up:")
-                (str "\n" emoji " Oops, something went wrong :disappointed: "
-                    "\nOrder not locked.\nThanks Obama :unamused:"))
+                (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
+                     "Today's order locked.\n:thumbsup:")
+                (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
+                     "Oops, something went wrong"
+                     "\nOrder not locked.\nThanks Obama :unamused:"))
             (str "\n" (helpers/random-emoji) " "
                 "Oops, only Admins can issue this command.\nThanks Obama :unamused:"))))
 
@@ -153,11 +167,14 @@
     "Admin command. Unlocks the current order."
     [request]
     (let [op-user-name (:user_name (:params request))
+          command-text (:text (:params request))
           emoji (helpers/random-emoji)]
         (if (helpers/user-is-admin? op-user-name)
             (if (try (db/unlock-order! {:order_date (helpers/todays-date)}) (catch Exception e))
-                (str "\n" emoji " Today's order unlocked.\n:thumbs_up:")
-                (str "\n" emoji " Oops, something went wrong :disappointed: "
+                (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
+                     "Today's order unlocked.\n:thumbsup:")
+                (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
+                     "Oops, something went wrong"
                      "\nOrder not unlocked.\nThanks Obama :unamused:"))
             (str "\n" emoji " Oops, only Admins can issue this command.\nThanks Obama :unamused:"))))
 
@@ -175,16 +192,20 @@
         (if (helpers/order-exists? (helpers/todays-date))
 
             (if (try (db/set-menu-url! {:url url :order_date (helpers/todays-date)}) (catch Exception e))
-                (str "\n" emoji " Menu URL successfully updated aww yea")
-                (str "\n" emoji " Oops, something went wrong :disappointed:\n"
-                    "Menu URL not added.\nThanks Obama :unamused:"))
+                (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
+                     "Menu URL successfully updated aww yea")
+                (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
+                     "Oops, something went wrong"
+                     "\nMenu URL not added.\nThanks Obama :unamused:"))
 
-            (str "\n" emoji " Oops, something went wrong :disappointed: \n" 
-                "There is no current order in the system for today.\n"
-                "Please add that first, then issue this command again.\n"
-                "Thanks Obama :unamused:"))
+            (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
+                 "Oops, something went wrong\n" 
+                 "There is no current order in the system for today.\n"
+                 "Please add that first, then issue this command again.\n"
+                 "Thanks Obama :unamused:"))
 
-        (str "\n" emoji " Oops, only Admins can issue this command.\nThanks Obama :unamused:"))))
+        (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
+             "Oops, only Admins can issue this command.\nThanks Obama :unamused:"))))
 
 (defn --new-order 
     "Admin command. Initialize a new order in the system for today's date."
@@ -198,17 +219,22 @@
         (if (helpers/user-is-admin? op-user-name)
 
             (if (= vendor-name "")
-                (str "\n" emoji " Oops, you need to supply a vendor name to create an order :flushed: "
+                (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
+                     "Oops, you need to supply a vendor name to create an order :flushed: "
                      "\nThanks Obama :unamused:")
 
                 (if (helpers/order-exists? (helpers/todays-date))
-                    (str "\n" emoji " There is already an order in the system for today.\nThanks Obama :unamused:")
+                    (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
+                         "There is already an order in the system for today.\nThanks Obama :unamused:")
                     (if (try (db/create-order! {:vendor_name vendor-name}) (catch Exception e))
-                        (str "\n" emoji " Today's order successfully added aww yea")
-                        (str "\n" emoji " Oops, something went wrong :disappointed: \n"
-                            "New order not added.\nThanks Obama :unamused:"))))
+                        (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
+                             "Today's order successfully added aww yea")
+                        (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
+                             "Oops, something went wrong\n"
+                             "New order not added.\nThanks Obama :unamused:"))))
 
-            (str "\n" emoji " Oops, only Admins can issue this command.\nThanks Obama :unamused:"))))
+            (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
+                 "Oops, only Admins can issue this command.\nThanks Obama :unamused:"))))
 
 (defn --user-add 
     "Admin command. Add a user to the system."
@@ -223,9 +249,11 @@
         (if (helpers/user-is-admin? op-user-name)
         
             (if (try (db/user-add! {:slack_user_name slack-user-name :full_name full-name}) (catch Exception e))
-                (str "\n" emoji " User added: @" slack-user-name " (" full-name ")\n:thumbs_up:")
-                (str "\n" emoji " Oops, something went wrong :disappointed: \n"
-                    "User @" slack-user-name " (" full-name ") not added.\nThanks Obama :unamused:"))
+                (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
+                     "User added: @" slack-user-name " (" full-name ")\n:thumbsup:")
+                (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
+                     "Oops, something went wrong\n"
+                     "User @" slack-user-name " (" full-name ") not added.\nThanks Obama :unamused:"))
 
             (str "\n" emoji " Oops, only Admins can issue this command.\nThanks Obama :unamused:"))))
 
@@ -243,20 +271,28 @@
             (if (helpers/user-exists? slack-user-name)
 
                 (if (try (db/user-remove! {:slack_user_name slack-user-name}) (catch Exception e))
-                    (str "\n" emoji " User @" slack-user-name " removed\n:thumbs_up:")
-                    (str "\n" emoji " Oops, something went wrong :disappointed: \n"
-                        "User " slack-user-name " not removed.\nThanks Obama :unamused:"))
+                    (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
+                         "User @" slack-user-name " removed\n:thumbsup:")
+                    (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
+                         "Oops, something went wrong :disappointed: \n"
+                         "User " slack-user-name " not removed.\nThanks Obama :unamused:"))
 
-                (str "\n" emoji " Oops, this user doesn't exist, so there's nothing to remove.\nThanks Obama :unamused:"))
+                (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
+                     "Oops, this user doesn't exist, so there's nothing to remove.\nThanks Obama :unamused:"))
 
-            (str "\n" emoji " Oops, only Admins can issue this command.\nThanks Obama :unamused:"))))
+            (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
+                 "Oops, only Admins can issue this command.\nThanks Obama :unamused:"))))
 
 (defn --user-list 
     "Admin command. Fetches users from DB; returns results as a string, formatted for Slack"
     [request]
     (if (helpers/user-is-admin? (:user_name (:params request)))
-        (let [users (db/user-list)] (str/join (map helpers/stringify-users-row users)))
-        (str "\n" (helpers/random-emoji) " Oops, only Admins can issue this command.\nThanks Obama :unamused:")))
+        (let [command-text (:text (:params request))
+              users (db/user-list)] 
+            (str (helpers/random-emoji) " `/veggie-lunch " command-text "`"
+                 (str/join (map helpers/stringify-users-row users))))
+        (str (helpers/random-emoji) " `" (:text (:params request)) "`\n"
+             "Oops, only Admins can issue this command.\nThanks Obama :unamused:")))
 
 (defn --user-status
     "Admin command. Update the status of a user in the DB."
@@ -278,16 +314,21 @@
 
                     (if (try (db/update-user-status! {:slack_user_name slack-user-name :active_status new-status-int}) 
                         (catch Exception e))
-                        (str "\n" emoji " User " slack-user-name " changed to '" (str/capitalize new-status) 
-                             "'\n:thumbs_up:")
-                        (str "\n" emoji " Oops, something went wrong :disappointed: \n"
-                            "Status for user " slack-user-name " was not changed.\nThanks Obama :unamused:"))
+                        (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
+                             "User " slack-user-name " changed to '" (str/capitalize new-status) 
+                             "'\n:thumbsup:")
+                        (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
+                             "Oops, something went wrong\n"
+                             "Status for user " slack-user-name " was not changed.\nThanks Obama :unamused:"))
 
-                    (str "\n" emoji " Oops, this user doesn't exist.\nThanks Obama :unamused:"))
+                    (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
+                         "Oops, this user doesn't exist.\nThanks Obama :unamused:"))
 
-                (str "\n" emoji " Oops, you can't update a user's status to that.\nThanks Obama :unamused:"))
+                (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
+                     "Oops, you can't update a user's status to that.\nThanks Obama :unamused:"))
 
-            (str "\n" emoji " Oops, only Admins can issue this command.\nThanks Obama :unamused:"))))
+            (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
+                 "Oops, only Admins can issue this command.\nThanks Obama :unamused:"))))
 
 (defn --user-perm 
     "Admin command. Updates a user's (permission) level by Slack @id. 
@@ -311,12 +352,17 @@
 
                     (if (try (db/user-perm! {:slack_user_name slack-user-name :level new-level-int}) 
                         (catch Exception e))
-                        (str "\n" emoji " User " slack-user-name " changed to " (str/capitalize new-level) "\n:thumbs_up:")
-                        (str "\n" emoji " Oops, something went wrong :disappointed: \n"
-                            "User " slack-user-name " was not changed.\nThanks Obama :unamused:"))
+                        (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
+                             "User " slack-user-name " changed to " (str/capitalize new-level) "\n:thumbsup:")
+                        (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
+                             "Oops, something went wrong\n"
+                             "User " slack-user-name " was not changed.\nThanks Obama :unamused:"))
 
-                    (str "\n" emoji " Oops, this user doesn't exist.\nThanks Obama :unamused:"))
+                    (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
+                         "Oops, this user doesn't exist.\nThanks Obama :unamused:"))
 
-                (str "\n" emoji " Oops, you can't change a user to that.\nThanks Obama :unamused:"))
+                (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
+                     "Oops, you can't change a user to that.\nThanks Obama :unamused:"))
 
-            (str "\n" emoji " Oops, only Admins can issue this command.\nThanks Obama :unamused:"))))
+            (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
+                 "Oops, only Admins can issue this command.\nThanks Obama :unamused:"))))

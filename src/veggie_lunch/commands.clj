@@ -15,7 +15,7 @@
 (defn --about 
     ""
     [request]
-    (render-file "templates/about.txt" {:emoji (helpers/random-emoji) :version (:app-version request)})
+    (render-file "templates/--about.txt" {:emoji (helpers/random-emoji) :version (:app-version request)})
 )
 
 (defn --delete 

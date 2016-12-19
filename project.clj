@@ -12,7 +12,8 @@
                  [org.clojure/java.jdbc "0.6.1"]
                  [org.xerial/sqlite-jdbc "3.15.1"]
                  [clj-time "0.12.2"]
-                 [yesql "0.5.3"]]
+                 [yesql "0.5.3"]
+                 [selmer "1.10.2"]]
   
   ; Still working out the ideal options here:
   :main ^:skip-aot veggie-lunch.core

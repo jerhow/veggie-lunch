@@ -2,7 +2,8 @@
   (:require [veggie-lunch.db.core :as db]
             [veggie-lunch.helpers :as helpers]
             [ring.util.response :refer [response content-type status header]]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [selmer.parser :refer [render-file]]))
 
 ; NOTE: Remember that all of the commands automatically get passed the 'request' map
 ; by the dispatcher, meaning you need to pick out anything you may need 
@@ -14,8 +15,8 @@
 (defn --about 
     ""
     [request]
-    (str "\n" (helpers/random-emoji) " Veggie-lunch version " (:app-version request)
-         "\nSource: https://github.com/jerhow/veggie-lunch"))
+    (render-file "templates/about.txt" {:emoji (helpers/random-emoji) :version (:app-version request)})
+)
 
 (defn --delete 
     "How a user removes their item from the current order."

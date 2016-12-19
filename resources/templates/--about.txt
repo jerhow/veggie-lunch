@@ -1,3 +1,2 @@
-
 {{emoji}} Veggie-lunch version {{version}}
 Source: https://github.com/jerhow/veggie-lunch

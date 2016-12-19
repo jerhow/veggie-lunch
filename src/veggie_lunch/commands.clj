@@ -9,14 +9,16 @@
 ; by the dispatcher, meaning you need to pick out anything you may need 
 ; from within your command's specific implementation.
 
+(def ftn helpers/fix-tmpl-newlines) ; since we use this function all over the place, let's alias it to something short
+
 ; ================
 ; User commands:
 ; ================
 (defn --about 
     ""
     [request]
-    (render-file "templates/--about.txt" {:emoji (helpers/random-emoji) :version (:app-version request)})
-)
+    (ftn (render-file "templates/--about.txt" 
+        {:cmd-text (:text (:params request)) :emoji (helpers/random-emoji) :version (:app-version request)})))
 
 (defn --delete 
     "How a user removes their item from the current order."
@@ -28,17 +30,10 @@
         (if (helpers/order-exists? (helpers/todays-date))
             (if (try (db/delete-order-item! {:slack_user_name op-user-name :order_date (helpers/todays-date)}) 
                     (catch Exception e))
-                (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
-                    "Order deleted successfully awww yea")
-                (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
-                     "Oops, something went wrong:"
-                     "\nOrder item not deleted.\nThanks Obama :unamused:"))
+                (ftn (render-file "templates/--delete.txt" {:emoji emoji :cmd-text command-text :tmpl-path "200"}))
+                (ftn (render-file "templates/--delete.txt" {:emoji emoji :cmd-text command-text :tmpl-path "500"})))
 
-            (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
-                 "Oops, something went wrong :disappointed: \n" 
-                 "There is no current order in the system for today.\n"
-                 "Please ask an Admin to start today's order, then try again.\n"
-                 "Thanks Obama :unamused:"))))
+            (ftn (render-file "templates/--delete.txt" {:emoji emoji :cmd-text command-text :tmpl-path "404"})))))
 
 (defn --help 
     "Parses out the command for which help is being requested, 

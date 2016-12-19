@@ -94,6 +94,12 @@
             -1
             (:id (first rows)))))
 
+(defn fix-tmpl-newlines
+    "Guarantees that any templated output will have one leading newline,
+     and no trailing newlines, which is the standard we want across the app."
+    [s]
+    (str/replace (str/replace s #"^\n*" "\n") #"\n+$" ""))
+
 (defn random-emoji
     ""
     []

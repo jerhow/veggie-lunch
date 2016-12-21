@@ -111,17 +111,10 @@
         (if (helpers/order-exists? (helpers/todays-date))
             (if (try (db/upsert-order-item! 
                 {:user_id slack-user-name :order_id order-id :order_text order-text}) (catch Exception e))
-                (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
-                     "Order written successfully awww yea")
-                (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
-                     "Oops, something went wrong"
-                     "\nOrder item not added.\nThanks Obama :unamused:"))
+                (ftn (render-file "templates/--order.txt" {:emoji emoji :cmd-text command-text :tmpl-path "200"}))
+                (ftn (render-file "templates/--order.txt" {:emoji emoji :cmd-text command-text :tmpl-path "500"})))
 
-            (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
-                 "Oops, something went wrong\n" 
-                 "There is no current order in the system for today.\n"
-                 "Please ask an Admin to start today's order, then try again.\n"
-                 "Thanks Obama :unamused:"))))
+            (ftn (render-file "templates/--order.txt" {:emoji emoji :cmd-text command-text :tmpl-path "404"})))))
 
 (defn --status
     "Find out what's going on in the system at a given moment.

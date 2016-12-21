@@ -125,13 +125,8 @@
           todays-date (helpers/todays-date)
           emoji (helpers/random-emoji)]
         (if (helpers/order-exists? todays-date)
-            (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
-                 "Welcome! A list *has* been started for today :tada:\n"
-                 "Feel free to add your order to the list!\n"
-                 "Try `/veggie-lunch --help --order` if you need more information.")
-            (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
-                 "Welcome! Unfortunately, a list has not yet been started today.\n"
-                 "_Where's an admin when you need one?_ :unamused:"))))
+            (ftn (render-file "templates/--status.txt" {:emoji emoji :cmd-text command-text :tmpl-path "200"}))
+            (ftn (render-file "templates/--status.txt" {:emoji emoji :cmd-text command-text :tmpl-path "404"})))))
 
 ; ================
 ; Admin commands:

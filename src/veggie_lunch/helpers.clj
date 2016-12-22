@@ -108,11 +108,11 @@
 (defn stringify-users-row 
     "Takes a row from the 'users' table and formats it for output in Slack"
     [row] 
-    (str "\n\n" 
+    (str "\n" 
         "Slack User Name: *" (:slack_user_name row) "*\n"
         "Full Name: *" (:full_name row) "*\n"
         "Level: *" (:level row) "*\n"
-        "Created: *" (:created_dt row) "*"))
+        "Created: *" (:created_dt row) "*\n"))
 
 (defn stringify-order-item-row
     "Takes a row from db/fetch-order-items and formats it for output in Slack"

@@ -3,7 +3,8 @@
             [veggie-lunch.helpers :as helpers]
             [ring.util.response :refer [response content-type status header]]
             [clojure.string :as str]
-            [selmer.parser :refer [render-file]]))
+            [selmer.parser :refer [render-file]]
+            [selmer.util :refer [without-escaping]]))
 
 ; NOTE: Remember that all of the commands automatically get passed the 'request' map
 ; by the dispatcher, meaning you need to pick out anything you may need 
@@ -271,12 +272,12 @@
     "Admin command. Fetches users from DB; returns results as a string, formatted for Slack"
     [request]
     (if (helpers/user-is-admin? (:user_name (:params request)))
-        (let [command-text (:text (:params request))
-              users (db/user-list)] 
-            (str (helpers/random-emoji) " `/veggie-lunch " command-text "`"
-                 (str/join (map helpers/stringify-users-row users))))
-        (str (helpers/random-emoji) " `" (:text (:params request)) "`\n"
-             "Oops, only Admins can issue this command.\nThanks Obama :unamused:")))
+        (let [command-text (:text (:params request)) users (db/user-list)] 
+            (ftn (without-escaping (render-file "templates/--user-list.txt" {
+                    :emoji (helpers/random-emoji) :cmd-text (:text (:params request)) :tmpl-path "200" 
+                    :rows (str/join (map helpers/stringify-users-row users))}))))
+        (ftn (render-file "templates/--user-list.txt" {
+                :emoji (helpers/random-emoji) :cmd-text (:text (:params request)) :tmpl-path "403"}))))
 
 (defn --user-status
     "Admin command. Update the status of a user in the DB."

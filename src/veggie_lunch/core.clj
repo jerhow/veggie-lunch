@@ -9,6 +9,8 @@
             [ring.middleware.params :refer :all]
             [org.httpkit.server :refer [run-server]]))
 
+(selmer.parser/cache-off!)
+
 (defroutes all-routes
     (POST "/" [request] controllers/home))
 

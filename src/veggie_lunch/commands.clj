@@ -182,20 +182,12 @@
         (if (helpers/order-exists? (helpers/todays-date))
 
             (if (try (db/set-menu-url! {:url url :order_date (helpers/todays-date)}) (catch Exception e))
-                (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
-                     "Menu URL successfully updated aww yea")
-                (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
-                     "Oops, something went wrong"
-                     "\nMenu URL not added.\nThanks Obama :unamused:"))
+                (ftn (render-file "templates/--set-menu-url.txt" {:emoji emoji :cmd-text command-text :tmpl-path "200"}))
+                (ftn (render-file "templates/--set-menu-url.txt" {:emoji emoji :cmd-text command-text :tmpl-path "500"})))
 
-            (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
-                 "Oops, something went wrong\n" 
-                 "There is no current order in the system for today.\n"
-                 "Please add that first, then issue this command again.\n"
-                 "Thanks Obama :unamused:"))
+            (ftn (render-file "templates/--set-menu-url.txt" {:emoji emoji :cmd-text command-text :tmpl-path "404"})))
 
-        (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
-             "Oops, only Admins can issue this command.\nThanks Obama :unamused:"))))
+        (ftn (render-file "templates/--set-menu-url.txt" {:emoji emoji :cmd-text command-text :tmpl-path "403"})))))
 
 (defn --new-order 
     "Admin command. Initialize a new order in the system for today's date."

@@ -26,13 +26,14 @@
     [request]
     (let [op-user-name (:user_name (:params request))
           command-text (:text (:params request))
+          tmpl-path (helpers/tmpl-path (str/split command-text #" "))
           emoji (helpers/random-emoji)]
 
         (if (helpers/order-exists? (helpers/todays-date))
             (if (try (db/delete-order-item! {:slack_user_name op-user-name :order_date (helpers/todays-date)}) 
                     (catch Exception e))
-                (ftn (render-file "templates/--delete.txt" {:emoji emoji :cmd-text command-text :tmpl-block "200"}))
-                (ftn (render-file "templates/--delete.txt" {:emoji emoji :cmd-text command-text :tmpl-block "500"})))
+                (ftn (render-file tmpl-path {:emoji emoji :cmd-text command-text :tmpl-block "200"}))
+                (ftn (render-file tmpl-path {:emoji emoji :cmd-text command-text :tmpl-block "500"})))
 
             (ftn (render-file "templates/--delete.txt" {:emoji emoji :cmd-text command-text :tmpl-block "404"})))))
 

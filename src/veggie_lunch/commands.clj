@@ -157,9 +157,15 @@
           command-text (:text (:params request))
           emoji (helpers/random-emoji)]
         (if (helpers/user-is-admin? op-user-name)
-            (if (try (db/unlock-order! {:order_date (helpers/todays-date)}) (catch Exception e))
-                (ftn (render-file "templates/--unlock.txt" {:emoji emoji :cmd-text command-text :tmpl-path "200"}))
-                (ftn (render-file "templates/--unlock.txt" {:emoji emoji :cmd-text command-text :tmpl-path "500"})))
+
+            (if (helpers/order-exists? (helpers/todays-date))
+
+                (if (try (db/unlock-order! {:order_date (helpers/todays-date)}) (catch Exception e))
+                    (ftn (render-file "templates/--unlock.txt" {:emoji emoji :cmd-text command-text :tmpl-path "200"}))
+                    (ftn (render-file "templates/--unlock.txt" {:emoji emoji :cmd-text command-text :tmpl-path "500"})))
+
+                (ftn (render-file "templates/--unlock.txt" {:emoji emoji :cmd-text command-text :tmpl-path "404"})))
+
             (ftn (render-file "templates/--unlock.txt" {:emoji emoji :cmd-text command-text :tmpl-path "403"})))))
 
 (defn --set-menu-url 

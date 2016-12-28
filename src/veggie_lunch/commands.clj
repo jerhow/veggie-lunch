@@ -140,13 +140,9 @@
           emoji (helpers/random-emoji)]
         (if (helpers/user-is-admin? op-user-name)
             (if (try (db/lock-order! {:order_date (helpers/todays-date)}) (catch Exception e))
-                (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
-                     "Today's order locked.\n:thumbsup:")
-                (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
-                     "Oops, something went wrong"
-                     "\nOrder not locked.\nThanks Obama :unamused:"))
-            (str "\n" (helpers/random-emoji) " "
-                "Oops, only Admins can issue this command.\nThanks Obama :unamused:"))))
+                (ftn (render-file "templates/--lock.txt" {:emoji emoji :cmd-text command-text :tmpl-path "200"}))
+                (ftn (render-file "templates/--lock.txt" {:emoji emoji :cmd-text command-text :tmpl-path "500"})))
+            (ftn (render-file "templates/--lock.txt" {:emoji emoji :cmd-text command-text :tmpl-path "403"})))))
 
 (defn --unlock 
     "Admin command. Unlocks the current order."

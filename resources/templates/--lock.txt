@@ -1,0 +1,17 @@
+{% ifequal tmpl-path "200" %}
+{{emoji}} `/veggie-lunch {{cmd-text}}`
+Today's order locked :thumbsup:
+{% endifequal %}
+
+{% ifequal tmpl-path "403" %}
+{{emoji}} `/veggie-lunch {{cmd-text}}`
+Oops, only Admins can issue this command.
+Thanks Obama :unamused:
+{% endifequal %}
+
+{% ifequal tmpl-path "500" %}
+{{emoji}} `/veggie-lunch {{cmd-text}}`
+Oops, something went wrong
+Order not locked.
+Thanks Obama :unamused:
+{% endifequal %}

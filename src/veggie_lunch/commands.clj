@@ -195,22 +195,23 @@
     (let [op-user-name (:user_name (:params request))
           command-text (:text (:params request))
           command-text-parts (str/split command-text #" ")
+          tmpl-path (helpers/tmpl-path command-text-parts)
           vendor-name (str/join " " (rest command-text-parts))
           emoji (helpers/random-emoji)]
 
         (if (helpers/user-is-admin? op-user-name)
 
             (if (= vendor-name "")
-                (ftn (render-file "templates/--new-order.txt" {:emoji emoji :cmd-text command-text :tmpl-path "404"}))
+                (ftn (render-file tmpl-path {:emoji emoji :cmd-text command-text :tmpl-path "404"}))
 
                 (if (helpers/order-exists? (helpers/todays-date))
-                    (ftn (render-file "templates/--new-order.txt" {:emoji emoji :cmd-text command-text :tmpl-path "409"}))
+                    (ftn (render-file tmpl-path {:emoji emoji :cmd-text command-text :tmpl-path "409"}))
 
                     (if (try (db/create-order! {:vendor_name vendor-name}) (catch Exception e))
-                        (ftn (render-file "templates/--new-order.txt" {:emoji emoji :cmd-text command-text :tmpl-path "200"}))
-                        (ftn (render-file "templates/--new-order.txt" {:emoji emoji :cmd-text command-text :tmpl-path "500"})))))
+                        (ftn (render-file tmpl-path {:emoji emoji :cmd-text command-text :tmpl-path "200"}))
+                        (ftn (render-file tmpl-path {:emoji emoji :cmd-text command-text :tmpl-path "500"})))))
 
-            (ftn (render-file "templates/--new-order.txt" {:emoji emoji :cmd-text command-text :tmpl-path "403"})))))
+            (ftn (render-file tmpl-path {:emoji emoji :cmd-text command-text :tmpl-path "403"})))))
 
 (defn --user-add 
     "Admin command. Add a user to the system."

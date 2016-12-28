@@ -128,6 +128,14 @@
                   :slack-user-name (first (next text-parts))
                   :full-name (next (next text-parts)))))
 
+(defn tmpl-path
+    "A helper for our commands. Expects a vector containing 
+     the command text, split out, which each command function 
+     should already have. Returns a string containing the relative
+     path to a command's corresponding template."
+    [command-text-parts]
+    (str "templates/" (first command-text-parts) ".txt"))
+
 (defn todays-date 
     "Returns the date as a YYYY-MM-DD formatted string"
     []

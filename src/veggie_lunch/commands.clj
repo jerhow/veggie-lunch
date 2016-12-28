@@ -35,7 +35,7 @@
                 (ftn (render-file tmpl-path {:emoji emoji :cmd-text command-text :tmpl-block "200"}))
                 (ftn (render-file tmpl-path {:emoji emoji :cmd-text command-text :tmpl-block "500"})))
 
-            (ftn (render-file "templates/--delete.txt" {:emoji emoji :cmd-text command-text :tmpl-block "404"})))))
+            (ftn (render-file tmpl-path {:emoji emoji :cmd-text command-text :tmpl-block "404"})))))
 
 (defn --help 
     "Parses out the command for which help is being requested, 

@@ -1,26 +1,26 @@
-{% ifequal tmpl-path "200" %}
+{% ifequal tmpl-block "200" %}
 {{emoji}} `/veggie-lunch {{cmd-text}}`
 Today's order successfully added aww yea
 {% endifequal %}
 
-{% ifequal tmpl-path "403" %}
+{% ifequal tmpl-block "403" %}
 {{emoji}} `/veggie-lunch {{cmd-text}}`
 Oops, only Admins can issue this command.
 Thanks Obama :unamused:
 {% endifequal %}
 
-{% ifequal tmpl-path "404" %}
+{% ifequal tmpl-block "404" %}
 {{emoji}} `/veggie-lunch {{cmd-text}}`
 Oops, you need to supply a vendor name to create an order :flushed:
 {% endifequal %}
 
-{% ifequal tmpl-path "409" %}
+{% ifequal tmpl-block "409" %}
 {{emoji}} `/veggie-lunch {{cmd-text}}`
 There is already an order in the system for today.
 Thanks Obama :unamused:
 {% endifequal %}
 
-{% ifequal tmpl-path "500" %}
+{% ifequal tmpl-block "500" %}
 {{emoji}} `/veggie-lunch {{cmd-text}}`
 Oops, something went wrong
 New order not added.

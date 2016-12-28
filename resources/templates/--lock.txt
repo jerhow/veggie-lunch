@@ -1,21 +1,21 @@
-{% ifequal tmpl-path "200" %}
+{% ifequal tmpl-block "200" %}
 {{emoji}} `/veggie-lunch {{cmd-text}}`
 Today's order locked :thumbsup:
 {% endifequal %}
 
-{% ifequal tmpl-path "403" %}
+{% ifequal tmpl-block "403" %}
 {{emoji}} `/veggie-lunch {{cmd-text}}`
 Oops, only Admins can issue this command.
 Thanks Obama :unamused:
 {% endifequal %}
 
-{% ifequal tmpl-path "404" %}
+{% ifequal tmpl-block "404" %}
 {{emoji}} `/veggie-lunch {{cmd-text}}`
 Hmm, a list has not yet been started today, so there is nothing to lock.
 Thanks Obama :unamused:
 {% endifequal %}
 
-{% ifequal tmpl-path "500" %}
+{% ifequal tmpl-block "500" %}
 {{emoji}} `/veggie-lunch {{cmd-text}}`
 Oops, something went wrong
 Order not locked.

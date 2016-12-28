@@ -1,4 +1,4 @@
-{% ifequal tmpl-path "404" %}
+{% ifequal tmpl-block "404" %}
 {{emoji}} `/veggie-lunch {{cmd-text}}`
 Oops, something went wrong :disappointed:
 There is no current order in the system for today.
@@ -6,12 +6,12 @@ Please ask an Admin to start today's order, then try again.
 Thanks Obama :unamused:
 {% endifequal %}
 
-{% ifequal tmpl-path "200" %}
+{% ifequal tmpl-block "200" %}
 {{emoji}} `/veggie-lunch {{cmd-text}}`
 Order deleted successfully awww yea
 {% endifequal %}
 
-{% ifequal tmpl-path "500" %}
+{% ifequal tmpl-block "500" %}
 {{emoji}} `/veggie-lunch {{cmd-text}}`
 Oops, something went wrong: 
 Order item not deleted.

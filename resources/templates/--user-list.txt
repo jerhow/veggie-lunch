@@ -1,9 +1,9 @@
-{% ifequal tmpl-path "200" %}
+{% ifequal tmpl-block "200" %}
 {{emoji}} `/veggie-lunch {{cmd-text}}`
 {{rows}}
 {% endifequal %}
 
-{% ifequal tmpl-path "403" %}
+{% ifequal tmpl-block "403" %}
 {{emoji}} `/veggie-lunch {{cmd-text}}`
 Oops, only Admins can issue this command.
 Thanks Obama :unamused:

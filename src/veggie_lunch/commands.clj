@@ -31,10 +31,10 @@
         (if (helpers/order-exists? (helpers/todays-date))
             (if (try (db/delete-order-item! {:slack_user_name op-user-name :order_date (helpers/todays-date)}) 
                     (catch Exception e))
-                (ftn (render-file "templates/--delete.txt" {:emoji emoji :cmd-text command-text :tmpl-path "200"}))
-                (ftn (render-file "templates/--delete.txt" {:emoji emoji :cmd-text command-text :tmpl-path "500"})))
+                (ftn (render-file "templates/--delete.txt" {:emoji emoji :cmd-text command-text :tmpl-block "200"}))
+                (ftn (render-file "templates/--delete.txt" {:emoji emoji :cmd-text command-text :tmpl-block "500"})))
 
-            (ftn (render-file "templates/--delete.txt" {:emoji emoji :cmd-text command-text :tmpl-path "404"})))))
+            (ftn (render-file "templates/--delete.txt" {:emoji emoji :cmd-text command-text :tmpl-block "404"})))))
 
 (defn --help 
     "Parses out the command for which help is being requested, 
@@ -112,10 +112,10 @@
         (if (helpers/order-exists? (helpers/todays-date))
             (if (try (db/upsert-order-item! 
                 {:user_id slack-user-name :order_id order-id :order_text order-text}) (catch Exception e))
-                (ftn (render-file "templates/--order.txt" {:emoji emoji :cmd-text command-text :tmpl-path "200"}))
-                (ftn (render-file "templates/--order.txt" {:emoji emoji :cmd-text command-text :tmpl-path "500"})))
+                (ftn (render-file "templates/--order.txt" {:emoji emoji :cmd-text command-text :tmpl-block "200"}))
+                (ftn (render-file "templates/--order.txt" {:emoji emoji :cmd-text command-text :tmpl-block "500"})))
 
-            (ftn (render-file "templates/--order.txt" {:emoji emoji :cmd-text command-text :tmpl-path "404"})))))
+            (ftn (render-file "templates/--order.txt" {:emoji emoji :cmd-text command-text :tmpl-block "404"})))))
 
 (defn --status
     "Find out what's going on in the system at a given moment.
@@ -126,8 +126,8 @@
           todays-date (helpers/todays-date)
           emoji (helpers/random-emoji)]
         (if (helpers/order-exists? todays-date)
-            (ftn (render-file "templates/--status.txt" {:emoji emoji :cmd-text command-text :tmpl-path "200"}))
-            (ftn (render-file "templates/--status.txt" {:emoji emoji :cmd-text command-text :tmpl-path "404"})))))
+            (ftn (render-file "templates/--status.txt" {:emoji emoji :cmd-text command-text :tmpl-block "200"}))
+            (ftn (render-file "templates/--status.txt" {:emoji emoji :cmd-text command-text :tmpl-block "404"})))))
 
 ; ================
 ; Admin commands:
@@ -143,12 +143,12 @@
             (if (helpers/order-exists? (helpers/todays-date))
 
                 (if (try (db/lock-order! {:order_date (helpers/todays-date)}) (catch Exception e))
-                    (ftn (render-file "templates/--lock.txt" {:emoji emoji :cmd-text command-text :tmpl-path "200"}))
-                    (ftn (render-file "templates/--lock.txt" {:emoji emoji :cmd-text command-text :tmpl-path "500"})))
+                    (ftn (render-file "templates/--lock.txt" {:emoji emoji :cmd-text command-text :tmpl-block "200"}))
+                    (ftn (render-file "templates/--lock.txt" {:emoji emoji :cmd-text command-text :tmpl-block "500"})))
 
-                (ftn (render-file "templates/--lock.txt" {:emoji emoji :cmd-text command-text :tmpl-path "404"})))
+                (ftn (render-file "templates/--lock.txt" {:emoji emoji :cmd-text command-text :tmpl-block "404"})))
 
-            (ftn (render-file "templates/--lock.txt" {:emoji emoji :cmd-text command-text :tmpl-path "403"})))))
+            (ftn (render-file "templates/--lock.txt" {:emoji emoji :cmd-text command-text :tmpl-block "403"})))))
 
 (defn --unlock 
     "Admin command. Unlocks the current order."
@@ -161,12 +161,12 @@
             (if (helpers/order-exists? (helpers/todays-date))
 
                 (if (try (db/unlock-order! {:order_date (helpers/todays-date)}) (catch Exception e))
-                    (ftn (render-file "templates/--unlock.txt" {:emoji emoji :cmd-text command-text :tmpl-path "200"}))
-                    (ftn (render-file "templates/--unlock.txt" {:emoji emoji :cmd-text command-text :tmpl-path "500"})))
+                    (ftn (render-file "templates/--unlock.txt" {:emoji emoji :cmd-text command-text :tmpl-block "200"}))
+                    (ftn (render-file "templates/--unlock.txt" {:emoji emoji :cmd-text command-text :tmpl-block "500"})))
 
-                (ftn (render-file "templates/--unlock.txt" {:emoji emoji :cmd-text command-text :tmpl-path "404"})))
+                (ftn (render-file "templates/--unlock.txt" {:emoji emoji :cmd-text command-text :tmpl-block "404"})))
 
-            (ftn (render-file "templates/--unlock.txt" {:emoji emoji :cmd-text command-text :tmpl-path "403"})))))
+            (ftn (render-file "templates/--unlock.txt" {:emoji emoji :cmd-text command-text :tmpl-block "403"})))))
 
 (defn --set-menu-url 
     "Admin command. Set the menu URL for today's order."
@@ -182,12 +182,12 @@
         (if (helpers/order-exists? (helpers/todays-date))
 
             (if (try (db/set-menu-url! {:url url :order_date (helpers/todays-date)}) (catch Exception e))
-                (ftn (render-file "templates/--set-menu-url.txt" {:emoji emoji :cmd-text command-text :tmpl-path "200"}))
-                (ftn (render-file "templates/--set-menu-url.txt" {:emoji emoji :cmd-text command-text :tmpl-path "500"})))
+                (ftn (render-file "templates/--set-menu-url.txt" {:emoji emoji :cmd-text command-text :tmpl-block "200"}))
+                (ftn (render-file "templates/--set-menu-url.txt" {:emoji emoji :cmd-text command-text :tmpl-block "500"})))
 
-            (ftn (render-file "templates/--set-menu-url.txt" {:emoji emoji :cmd-text command-text :tmpl-path "404"})))
+            (ftn (render-file "templates/--set-menu-url.txt" {:emoji emoji :cmd-text command-text :tmpl-block "404"})))
 
-        (ftn (render-file "templates/--set-menu-url.txt" {:emoji emoji :cmd-text command-text :tmpl-path "403"})))))
+        (ftn (render-file "templates/--set-menu-url.txt" {:emoji emoji :cmd-text command-text :tmpl-block "403"})))))
 
 (defn --new-order 
     "Admin command. Initialize a new order in the system for today's date."
@@ -202,16 +202,16 @@
         (if (helpers/user-is-admin? op-user-name)
 
             (if (= vendor-name "")
-                (ftn (render-file tmpl-path {:emoji emoji :cmd-text command-text :tmpl-path "404"}))
+                (ftn (render-file tmpl-path {:emoji emoji :cmd-text command-text :tmpl-block "404"}))
 
                 (if (helpers/order-exists? (helpers/todays-date))
-                    (ftn (render-file tmpl-path {:emoji emoji :cmd-text command-text :tmpl-path "409"}))
+                    (ftn (render-file tmpl-path {:emoji emoji :cmd-text command-text :tmpl-block "409"}))
 
                     (if (try (db/create-order! {:vendor_name vendor-name}) (catch Exception e))
-                        (ftn (render-file tmpl-path {:emoji emoji :cmd-text command-text :tmpl-path "200"}))
-                        (ftn (render-file tmpl-path {:emoji emoji :cmd-text command-text :tmpl-path "500"})))))
+                        (ftn (render-file tmpl-path {:emoji emoji :cmd-text command-text :tmpl-block "200"}))
+                        (ftn (render-file tmpl-path {:emoji emoji :cmd-text command-text :tmpl-block "500"})))))
 
-            (ftn (render-file tmpl-path {:emoji emoji :cmd-text command-text :tmpl-path "403"})))))
+            (ftn (render-file tmpl-path {:emoji emoji :cmd-text command-text :tmpl-block "403"})))))
 
 (defn --user-add 
     "Admin command. Add a user to the system."
@@ -266,10 +266,10 @@
     (if (helpers/user-is-admin? (:user_name (:params request)))
         (let [command-text (:text (:params request)) users (db/user-list)] 
             (ftn (without-escaping (render-file "templates/--user-list.txt" {
-                    :emoji (helpers/random-emoji) :cmd-text (:text (:params request)) :tmpl-path "200" 
+                    :emoji (helpers/random-emoji) :cmd-text (:text (:params request)) :tmpl-block "200" 
                     :rows (str/join (map helpers/stringify-users-row users))}))))
         (ftn (render-file "templates/--user-list.txt" {
-                :emoji (helpers/random-emoji) :cmd-text (:text (:params request)) :tmpl-path "403"}))))
+                :emoji (helpers/random-emoji) :cmd-text (:text (:params request)) :tmpl-block "403"}))))
 
 (defn --user-status
     "Admin command. Update the status of a user in the DB."

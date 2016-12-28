@@ -1,15 +1,15 @@
-{% ifequal tmpl-path "200" %}
+{% ifequal tmpl-block "200" %}
 {{emoji}} `/veggie-lunch {{cmd-text}}`
 Menu URL successfully updated aww yea
 {% endifequal %}
 
-{% ifequal tmpl-path "403" %}
+{% ifequal tmpl-block "403" %}
 {{emoji}} `/veggie-lunch {{cmd-text}}`
 Oops, only Admins can issue this command.
 Thanks Obama :unamused:
 {% endifequal %}
 
-{% ifequal tmpl-path "404" %}
+{% ifequal tmpl-block "404" %}
 {{emoji}} `/veggie-lunch {{cmd-text}}`
 Oops, something went wrong
 There is no current order in the system for today.
@@ -17,7 +17,7 @@ Please add that first, then issue this command again.
 Thanks Obama :unamused:
 {% endifequal %}
 
-{% ifequal tmpl-path "500" %}
+{% ifequal tmpl-block "500" %}
 {{emoji}} `/veggie-lunch {{cmd-text}}`
 Oops, something went wrong
 Menu URL not added.

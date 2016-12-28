@@ -1,11 +1,11 @@
-{% ifequal tmpl-path "200" %}
+{% ifequal tmpl-block "200" %}
 {{emoji}} `/veggie-lunch {{cmd-text}}`
 Welcome! A list *has* been started for today :tada:
 Feel free to add your order to the list!
 Try `/veggie-lunch --help --order` if you need more information.
 {% endifequal %}
 
-{% ifequal tmpl-path "404" %}
+{% ifequal tmpl-block "404" %}
 {{emoji}} `/veggie-lunch {{cmd-text}}`
 Welcome! Unfortunately, a list has not yet been started today.
 _Where's an admin when you need one?_ :unamused:

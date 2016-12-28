@@ -201,22 +201,16 @@
         (if (helpers/user-is-admin? op-user-name)
 
             (if (= vendor-name "")
-                (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
-                     "Oops, you need to supply a vendor name to create an order :flushed: "
-                     "\nThanks Obama :unamused:")
+                (ftn (render-file "templates/--new-order.txt" {:emoji emoji :cmd-text command-text :tmpl-path "404"}))
 
                 (if (helpers/order-exists? (helpers/todays-date))
-                    (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
-                         "There is already an order in the system for today.\nThanks Obama :unamused:")
-                    (if (try (db/create-order! {:vendor_name vendor-name}) (catch Exception e))
-                        (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
-                             "Today's order successfully added aww yea")
-                        (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
-                             "Oops, something went wrong\n"
-                             "New order not added.\nThanks Obama :unamused:"))))
+                    (ftn (render-file "templates/--new-order.txt" {:emoji emoji :cmd-text command-text :tmpl-path "409"}))
 
-            (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
-                 "Oops, only Admins can issue this command.\nThanks Obama :unamused:"))))
+                    (if (try (db/create-order! {:vendor_name vendor-name}) (catch Exception e))
+                        (ftn (render-file "templates/--new-order.txt" {:emoji emoji :cmd-text command-text :tmpl-path "200"}))
+                        (ftn (render-file "templates/--new-order.txt" {:emoji emoji :cmd-text command-text :tmpl-path "500"})))))
+
+            (ftn (render-file "templates/--new-order.txt" {:emoji emoji :cmd-text command-text :tmpl-path "403"})))))
 
 (defn --user-add 
     "Admin command. Add a user to the system."

@@ -128,10 +128,11 @@
     [request]
     (let [command-text (:text (:params request))
           todays-date (helpers/todays-date)
+          tmpl-path (helpers/tmpl-path (str/split command-text #" "))
           emoji (helpers/random-emoji)]
         (if (helpers/order-exists? todays-date)
-            (ftn (render-file "templates/--status.txt" {:emoji emoji :cmd-text command-text :tmpl-block "200"}))
-            (ftn (render-file "templates/--status.txt" {:emoji emoji :cmd-text command-text :tmpl-block "404"})))))
+            (ftn (render-file tmpl-path {:emoji emoji :cmd-text command-text :tmpl-block "200"}))
+            (ftn (render-file tmpl-path {:emoji emoji :cmd-text command-text :tmpl-block "404"})))))
 
 ; ================
 ; Admin commands:

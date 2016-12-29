@@ -1,0 +1,16 @@
+{% ifequal tmpl-block "200" %}
+{{emoji}} `/veggie-lunch {{cmd-text}}`
+User added: @{{slack-user-name}} ({{full-name}}) :thumbsup:
+{% endifequal %}
+
+{% ifequal tmpl-block "403" %}
+{{emoji}} `/veggie-lunch {{cmd-text}}`
+Oops, only Admins can issue this command :flushed:
+{% endifequal %}
+
+{% ifequal tmpl-block "500" %}
+{{emoji}} `/veggie-lunch {{cmd-text}}`
+Oops, something went wrong
+@{{slack-user-name}} ({{full-name}}) not added :thumbsdown:
+Does this user already exist? :thinking_face:
+{% endifequal %}

@@ -229,18 +229,18 @@
           command-text-parts (str/split command-text #" ")
           slack-user-name (str/replace (second command-text-parts) #"^\@" "")
           full-name (str/join " " (next (next command-text-parts)))
+          tmpl-path (helpers/tmpl-path command-text-parts)
           emoji (helpers/random-emoji)]
           
         (if (helpers/user-is-admin? op-user-name)
         
             (if (try (db/user-add! {:slack_user_name slack-user-name :full_name full-name}) (catch Exception e))
-                (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
-                     "User added: @" slack-user-name " (" full-name ")\n:thumbsup:")
-                (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
-                     "Oops, something went wrong\n"
-                     "User @" slack-user-name " (" full-name ") not added.\nThanks Obama :unamused:"))
+                (ftn (render-file tmpl-path {:emoji emoji :cmd-text command-text :tmpl-block "200" 
+                    :slack-user-name slack-user-name :full-name full-name}))
+                (ftn (render-file tmpl-path {:emoji emoji :cmd-text command-text :tmpl-block "500" 
+                    :slack-user-name slack-user-name :full-name full-name})))
 
-            (str "\n" emoji " Oops, only Admins can issue this command.\nThanks Obama :unamused:"))))
+            (ftn (render-file tmpl-path {:emoji emoji :cmd-text command-text :tmpl-block "403"})))))
 
 (defn --user-remove 
     "Admin command. Delete a user from the system by Slack user name (@name)"

@@ -249,6 +249,7 @@
           command-text (:text (:params request))
           command-text-parts (str/split command-text #" ")
           slack-user-name (str/replace (second command-text-parts) #"^\@" "")
+          tmpl-path (helpers/tmpl-path command-text-parts)
           emoji (helpers/random-emoji)]
           
         (if (helpers/user-is-admin? op-user-name)
@@ -256,17 +257,16 @@
             (if (helpers/user-exists? slack-user-name)
 
                 (if (try (db/user-remove! {:slack_user_name slack-user-name}) (catch Exception e))
-                    (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
-                         "User @" slack-user-name " removed\n:thumbsup:")
-                    (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
-                         "Oops, something went wrong :disappointed: \n"
-                         "User " slack-user-name " not removed.\nThanks Obama :unamused:"))
+                    (ftn (render-file tmpl-path {:emoji emoji :cmd-text command-text :tmpl-block "200" 
+                        :slack-user-name slack-user-name}))
+                    (ftn (render-file tmpl-path {:emoji emoji :cmd-text command-text :tmpl-block "500" 
+                        :slack-user-name slack-user-name})))
 
-                (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
-                     "Oops, this user doesn't exist, so there's nothing to remove.\nThanks Obama :unamused:"))
+                (ftn (render-file tmpl-path {:emoji emoji :cmd-text command-text :tmpl-block "404" 
+                    :slack-user-name slack-user-name})))
 
-            (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
-                 "Oops, only Admins can issue this command.\nThanks Obama :unamused:"))))
+            (ftn (render-file tmpl-path {:emoji emoji :cmd-text command-text :tmpl-block "403" 
+                        :slack-user-name slack-user-name})))))
 
 (defn --user-list 
     "Admin command. Fetches users from DB; returns results as a string, formatted for Slack"

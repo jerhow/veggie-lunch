@@ -1,0 +1,20 @@
+{% ifequal tmpl-block "200" %}
+{{emoji}} `/veggie-lunch {{cmd-text}}`
+User @{{slack-user-name}} removed :thumbsup:
+{% endifequal %}
+
+{% ifequal tmpl-block "403" %}
+{{emoji}} `/veggie-lunch {{cmd-text}}`
+Oops, only Admins can issue this command :flushed:
+{% endifequal %}
+
+{% ifequal tmpl-block "404" %}
+{{emoji}} `/veggie-lunch {{cmd-text}}`
+Oops, this user doesn't exist, so there's nothing to remove :flushed:
+{% endifequal %}
+
+{% ifequal tmpl-block "500" %}
+{{emoji}} `/veggie-lunch {{cmd-text}}`
+Oops, something went wrong
+@{{slack-user-name}} not removed :thumbsdown:
+{% endifequal %}

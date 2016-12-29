@@ -75,18 +75,15 @@
           vendor-name (:vendor_name (first rows))
           menu-url (:menu_url (first rows))
           status (:status (first rows))
-          order-items (str/join (map helpers/stringify-order-item-row rows))]
+          order-items (str/join (map helpers/stringify-order-item-row rows))
+          tmpl-path (helpers/tmpl-path command-text-parts)
+          emoji (helpers/random-emoji)]
 
         (if (helpers/order-exists? order-date)
-            (str "\n\n`" command-text "`\n" 
-                 "\n" (helpers/random-emoji) " TODAY'S ORDER " (helpers/random-emoji) "\n"
-                 "Date: " order-date "\n"
-                 "Vendor: " vendor-name "\n"
-                 "Menu: " menu-url "\n"
-                 "Status: " status "\n\n"
-                 order-items
-                 "*TOTAL: " (count rows) " item(s) requested*\n")
-            (str "\n" (helpers/random-emoji) " Oops, no order found.\nThanks Obama :unamused:"))))
+            (ftn (render-file tmpl-path {:emoji emoji :cmd-text command-text :tmpl-block "200"
+                :order-date order-date :vendor-name vendor-name :menu-url menu-url :status status
+                :order-items order-items :row-count (count rows)}))
+            (ftn (render-file tmpl-path {:emoji emoji :cmd-text command-text :tmpl-block "404"})))))
 
 (defn --menu 
     "Returns the menu URL (or default value) from the current order"

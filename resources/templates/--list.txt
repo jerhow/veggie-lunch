@@ -1,0 +1,17 @@
+{% ifequal tmpl-block "200" %}
+{{emoji}} `/veggie-lunch {{cmd-text}}`
+
+TODAY'S ORDER:
+
+Date: {{order-date}}
+Vendor: {{vendor-name}}
+Menu: {{menu-url}}
+Status: {{status}}
+
+{{order-items}}*TOTAL: {{row-count}} item(s) requested*
+{% endifequal %}
+
+{% ifequal tmpl-block "404" %}
+{{emoji}} `/veggie-lunch {{cmd-text}}`
+Oops, no order found :flushed:
+{% endifequal %}

@@ -1,0 +1,21 @@
+{% ifequal tmpl-block "200" %}
+{{emoji}} `/veggie-lunch {{cmd-text}}`
+
+{{help-text}}
+{% endifequal %}
+
+{% ifequal tmpl-block "404" %}
+{{emoji}} `/veggie-lunch {{cmd-text}}`
+
+Welcome! *veggie-lunch* is a tool for blah blah blah
+
+Several commands are available:\n"
+{{available-commands}}
+
+NOTE: Commands always start with '--'"
+
+Run /veggie-lunch --help $COMMAND for details."
+
+For example, to get help for the --menu command:
+`/veggie-lunch --help --menu`
+{% endifequal %}

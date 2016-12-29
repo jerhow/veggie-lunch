@@ -49,17 +49,15 @@
     (let [op-user-name (:user_name (:params request))
           command-text (:text (:params request))
           command-text-parts (str/split command-text #" ")
-          requested-help-command (nth command-text-parts 1 "--none")]
+          requested-help-command (nth command-text-parts 1 "--none")
+          tmpl-path (helpers/tmpl-path command-text-parts)
+          emoji (helpers/random-emoji)]
+
         (if (= requested-help-command "--none")
-            (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
-                 "\nWelcome! *veggie-lunch* is a tool for blah blah blah\n\n"
-                 "Several commands are available:\n"
-                 (str/join "\n" (sort helpers/permitted-commands))
-                 "\n\nNOTE: Commands always start with '--'"
-                 "\n\nRun /veggie-lunch --help $COMMAND for details."
-                 "\nFor example, to get help for the --menu command:\n"
-                 "`/veggie-lunch --help --menu`")
-            ((keyword (subs requested-help-command 2)) helpers/help-docs))))
+            (ftn (render-file tmpl-path {:emoji emoji :cmd-text command-text :tmpl-block "404"
+                :available-commands (str/join "\n" (sort helpers/permitted-commands))}))
+            (ftn (render-file tmpl-path {:emoji emoji :cmd-text command-text :tmpl-block "200"
+                :help-text ((keyword (subs requested-help-command 2)) helpers/help-docs)})))))
 
 (defn --list 
     "List out the requested items in a given order.

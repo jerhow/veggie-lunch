@@ -182,6 +182,7 @@
           command-text (:text (:params request))
           command-text-parts (str/split command-text #" ")
           url (str/join " " (rest command-text-parts))
+          tmpl-path (helpers/tmpl-path command-text-parts)
           emoji (helpers/random-emoji)]
 
       (if (helpers/user-is-admin? op-user-name)
@@ -189,12 +190,12 @@
         (if (helpers/order-exists? (helpers/todays-date))
 
             (if (try (db/set-menu-url! {:url url :order_date (helpers/todays-date)}) (catch Exception e))
-                (ftn (render-file "templates/--set-menu-url.txt" {:emoji emoji :cmd-text command-text :tmpl-block "200"}))
-                (ftn (render-file "templates/--set-menu-url.txt" {:emoji emoji :cmd-text command-text :tmpl-block "500"})))
+                (ftn (render-file tmpl-path {:emoji emoji :cmd-text command-text :tmpl-block "200"}))
+                (ftn (render-file tmpl-path {:emoji emoji :cmd-text command-text :tmpl-block "500"})))
 
-            (ftn (render-file "templates/--set-menu-url.txt" {:emoji emoji :cmd-text command-text :tmpl-block "404"})))
+            (ftn (render-file tmpl-path {:emoji emoji :cmd-text command-text :tmpl-block "404"})))
 
-        (ftn (render-file "templates/--set-menu-url.txt" {:emoji emoji :cmd-text command-text :tmpl-block "403"})))))
+        (ftn (render-file tmpl-path {:emoji emoji :cmd-text command-text :tmpl-block "403"})))))
 
 (defn --new-order 
     "Admin command. Initialize a new order in the system for today's date."

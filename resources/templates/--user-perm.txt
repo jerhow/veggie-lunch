@@ -1,0 +1,26 @@
+{% ifequal tmpl-block "200" %}
+{{emoji}} `/veggie-lunch {{cmd-text}}`
+User @{{slack-user-name}} changed to {{new-level}} :thumbsup:
+{% endifequal %}
+
+{% ifequal tmpl-block "403" %}
+{{emoji}} `/veggie-lunch {{cmd-text}}`
+Oops, only Admins can issue this command :flushed:
+{% endifequal %}
+
+{% ifequal tmpl-block "404" %}
+{{emoji}} `/veggie-lunch {{cmd-text}}`
+Oops, this user doesn't exist :flushed:
+{% endifequal %}
+
+{% ifequal tmpl-block "406" %}
+{{emoji}} `/veggie-lunch {{cmd-text}}`
+Oops, you can't change a user to that :flushed:
+{% endifequal %}
+
+{% ifequal tmpl-block "500" %}
+{{emoji}} `/veggie-lunch {{cmd-text}}`
+Oops, something went wrong
+User @{{slack-user-name}} was not changed.
+:thumbsdown:
+{% endifequal %}

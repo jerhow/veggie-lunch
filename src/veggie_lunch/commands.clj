@@ -327,10 +327,11 @@
     (let [op-user-name (:user_name (:params request))
           command-text (:text (:params request))
           command-text-parts (str/split command-text #" ")
-          slack-user-name (nth command-text-parts 1 "")
+          slack-user-name (str/replace (nth command-text-parts 1 "") #"^\@" "") ;; leading '@' is optional, so drop it
           level-whitelist #{"admin" "user"} ; <- a set
           new-level (nth command-text-parts 2 "User")
-          new-level-int (if (= (str/lower-case new-level) "admin") 2 1)
+          new-level-int (if (= (str/lower-case new-level) "admin") 2 1) ;; 1 for 'User', 2 for 'Admin'
+          tmpl-path (helpers/tmpl-path command-text-parts)
           emoji (helpers/random-emoji)]
           
         (if (helpers/user-is-admin? op-user-name)
@@ -341,17 +342,14 @@
 
                     (if (try (db/user-perm! {:slack_user_name slack-user-name :level new-level-int}) 
                         (catch Exception e))
-                        (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
-                             "User " slack-user-name " changed to " (str/capitalize new-level) "\n:thumbsup:")
-                        (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
-                             "Oops, something went wrong\n"
-                             "User " slack-user-name " was not changed.\nThanks Obama :unamused:"))
+                        (ftn (render-file tmpl-path {
+                            :emoji emoji :cmd-text command-text :tmpl-block "200" :slack-user-name slack-user-name 
+                            :new-level (str/capitalize new-level)}))
+                        (ftn (render-file tmpl-path {
+                            :emoji emoji :cmd-text command-text :tmpl-block "500" :slack-user-name slack-user-name})))
 
-                    (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
-                         "Oops, this user doesn't exist.\nThanks Obama :unamused:"))
+                    (ftn (render-file tmpl-path {:emoji emoji :cmd-text command-text :tmpl-block "404"})))
 
-                (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
-                     "Oops, you can't change a user to that.\nThanks Obama :unamused:"))
+                (ftn (render-file tmpl-path {:emoji emoji :cmd-text command-text :tmpl-block "406"})))
 
-            (str (helpers/random-emoji) " `/veggie-lunch " command-text "`\n"
-                 "Oops, only Admins can issue this command.\nThanks Obama :unamused:"))))
+            (ftn (render-file tmpl-path {:emoji emoji :cmd-text command-text :tmpl-block "403"})))))

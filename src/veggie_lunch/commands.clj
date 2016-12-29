@@ -271,13 +271,17 @@
 (defn --user-list 
     "Admin command. Fetches users from DB; returns results as a string, formatted for Slack"
     [request]
-    (if (helpers/user-is-admin? (:user_name (:params request)))
-        (let [command-text (:text (:params request)) users (db/user-list)] 
-            (ftn (without-escaping (render-file "templates/--user-list.txt" {
-                    :emoji (helpers/random-emoji) :cmd-text (:text (:params request)) :tmpl-block "200" 
-                    :rows (str/join (map helpers/stringify-users-row users))}))))
-        (ftn (render-file "templates/--user-list.txt" {
-                :emoji (helpers/random-emoji) :cmd-text (:text (:params request)) :tmpl-block "403"}))))
+    (let [op-user-name (:user_name (:params request))
+          command-text (:text (:params request))
+          tmpl-path (helpers/tmpl-path (str/split command-text #" "))
+          emoji (helpers/random-emoji)]
+        
+        (if (helpers/user-is-admin? op-user-name)
+            (ftn (without-escaping (render-file tmpl-path {
+                :emoji emoji :cmd-text command-text :tmpl-block "200" 
+                :rows (str/join (map helpers/stringify-users-row (db/user-list)))})))
+            
+            (ftn (render-file tmpl-path {:emoji emoji :cmd-text command-text :tmpl-block "403"})))))
 
 (defn --user-status
     "Admin command. Update the status of a user in the DB."

@@ -16,10 +16,12 @@
 ; User commands:
 ; ================
 (defn --about 
-    ""
+    "Standard 'About this app' info for the user"
     [request]
-    (ftn (render-file "templates/--about.txt" 
-        {:cmd-text (:text (:params request)) :emoji (helpers/random-emoji) :version (:app-version request)})))
+    (let [command-text (:text (:params request))
+          tmpl-path (helpers/tmpl-path (str/split command-text #" "))
+          emoji (helpers/random-emoji)]
+        (ftn (render-file tmpl-path {:cmd-text command-text :emoji emoji :version (:app-version request)}))))
 
 (defn --delete 
     "How a user removes their item from the current order."

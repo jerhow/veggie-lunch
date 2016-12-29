@@ -110,15 +110,16 @@
           order-text (str/join " " (rest command-text-parts))
           slack-user-name (helpers/fetch-user-id op-user-name)
           order-id (helpers/todays-order-id (helpers/todays-date))
+          tmpl-path (helpers/tmpl-path command-text-parts)
           emoji (helpers/random-emoji)]
 
         (if (helpers/order-exists? (helpers/todays-date))
             (if (try (db/upsert-order-item! 
                 {:user_id slack-user-name :order_id order-id :order_text order-text}) (catch Exception e))
-                (ftn (render-file "templates/--order.txt" {:emoji emoji :cmd-text command-text :tmpl-block "200"}))
-                (ftn (render-file "templates/--order.txt" {:emoji emoji :cmd-text command-text :tmpl-block "500"})))
+                (ftn (render-file tmpl-path {:emoji emoji :cmd-text command-text :tmpl-block "200"}))
+                (ftn (render-file tmpl-path {:emoji emoji :cmd-text command-text :tmpl-block "500"})))
 
-            (ftn (render-file "templates/--order.txt" {:emoji emoji :cmd-text command-text :tmpl-block "404"})))))
+            (ftn (render-file tmpl-path {:emoji emoji :cmd-text command-text :tmpl-block "404"})))))
 
 (defn --status
     "Find out what's going on in the system at a given moment.

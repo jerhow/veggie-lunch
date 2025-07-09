@@ -4,7 +4,7 @@ A Slack command integration to help manage the vegetarian lunch orders for our t
 
 Basically, this is a headless Clojure backend, whose frontend is Slack via the custom command `/veggie-lunch`
 
-Right now I'm backing this app with SQLite, but it can easily be tweaked to work with MySQL, PostgreSQL, or any other relational database with a JDBC driver.
+Right now I'm backing this app with [SQLite](https://sqlite.org/), but it can easily be tweaked to work with MySQL, PostgreSQL, or any other relational database with a JDBC driver.
 
 ## Usage
 
@@ -12,13 +12,13 @@ Currently, in development I'm running it with this:
 
 `lein run -m veggie-lunch.core`
 
-In production, I'm building a .jar with Leiningen:
+In production, I'm building a `.jar` with [Leiningen](https://leiningen.org/):
 
 `lein uberjar`
 
 ...and deploying it on a lightweight VPS, behind a reverse proxy, over SSL.
 
-Right now the app server is http-kit, but you should be able to drop in any other Ring-compliant server.
+Right now the app server is [http-kit](https://http-kit.github.io/), but you should be able to drop in any other Ring-compliant server.
 
 ## Commands
 

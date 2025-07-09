@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 -- name: populate-users!
+-- NOTE: These are Slack user IDs, which are not usable anyway. Still, this is not good practice - don't do this with real users. Populate the user table manually or via CI automation.
 INSERT INTO users (
     slack_user_id,
     slack_user_name,
@@ -18,10 +19,10 @@ INSERT INTO users (
     full_name
 )
 VALUES (
-    'U2XCP90V7',
-    '@rn',
+    '<Slack_user_id>',
+    '@<slack_handle>',
     1,
-    'Jerry'
+    'User name'
 );
 
 -- name: create-table-orders!

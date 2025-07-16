@@ -18,7 +18,7 @@ In production, I'm building a `.jar` with [Leiningen](https://leiningen.org/):
 
 ...and deploying it on a lightweight VPS, behind a reverse proxy, over SSL.
 
-Right now the app server is [http-kit](https://http-kit.github.io/), but you should be able to drop in any other Ring-compliant server.
+The app server I am using is [http-kit](https://http-kit.github.io/), but one should be able to drop in any other Ring-compliant server.
 
 ## Commands
 
